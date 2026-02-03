@@ -2703,6 +2703,7 @@
         }
         
         updateStreakDisplays();
+        updateStatsDisplay(); // Update stats modal display
       }
       
       currentPlayerName = name;
@@ -2739,7 +2740,8 @@
         const isValid = await verifyPassword(pendingName, password);
         if (isValid) {
           hideRegisterModal();
-          await completeNameSetup(pendingName);
+          await completeNameSetup(pendingName, true); // Force load stats on login
+          updateStatsDisplay(); // Update stats display after loading
         } else {
           alert("Incorrect password. Please try again.");
           registerPassword.value = "";
@@ -2754,7 +2756,8 @@
         const success = await registerName(pendingName, password);
         if (success) {
           hideRegisterModal();
-          await completeNameSetup(pendingName);
+          await completeNameSetup(pendingName, true); // Force load stats on registration
+          updateStatsDisplay(); // Update stats display after loading
         }
       }
     });
