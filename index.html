@@ -2851,10 +2851,11 @@
 
       if (isLoginMode) {
         // Login: verify password
-        const isValid = await verifyPassword(pendingName, password);
+        const nameToUse = pendingName; // Save name before hiding modal
+        const isValid = await verifyPassword(nameToUse, password);
         if (isValid) {
           hideRegisterModal();
-          await completeNameSetup(pendingName, true); // Force load stats on login
+          await completeNameSetup(nameToUse, true); // Force load stats on login
           updateStatsDisplay(); // Update stats display after loading
         } else {
           alert("Incorrect password. Please try again.");
@@ -2863,14 +2864,15 @@
         }
       } else {
         // Register: create new registration
+        const nameToUse = pendingName; // Save name before hiding modal
         if (password.length < 4) {
           alert("Password must be at least 4 characters long.");
           return;
         }
-        const success = await registerName(pendingName, password);
+        const success = await registerName(nameToUse, password);
         if (success) {
           hideRegisterModal();
-          await completeNameSetup(pendingName, true); // Force load stats on registration
+          await completeNameSetup(nameToUse, true); // Force load stats on registration
           updateStatsDisplay(); // Update stats display after loading
         }
       }
@@ -2878,13 +2880,14 @@
 
     registerCancelBtn.addEventListener("click", hideRegisterModal);
     registerSkipBtn.addEventListener("click", async () => {
-      if (!pendingName || !pendingName.trim()) {
+      const nameToUse = pendingName; // Save name before hiding modal
+      if (!nameToUse || !nameToUse.trim()) {
         console.log("Skip clicked but no pending name");
         hideRegisterModal();
         return;
       }
       hideRegisterModal();
-      await completeNameSetup(pendingName);
+      await completeNameSetup(nameToUse);
     });
     registerModal.addEventListener("click", (e) => {
       if (e.target === registerModal) hideRegisterModal();
