@@ -1,0 +1,2752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5-in-a-Row</title>
+  <style>
+    :root {
+      --bg-main: linear-gradient(165deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+      --board-bg: #e2e8f0;
+      --cell-bg: #ffffff;
+      --cell-bg-hover: #f8fafc;
+      --x-color: #dc2626;
+      --o-color: #2563eb;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      --shadow-soft: var(--shadow-xl);
+      --shadow-soft-inner: inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --app-bg: rgba(255, 255, 255, 0.95);
+      --app-border: rgba(226, 232, 240, 0.9);
+      --player-tag-bg: rgba(248, 250, 252, 0.95);
+      --player-tag-border: rgba(226, 232, 240, 0.9);
+      --input-bg: #ffffff;
+      --input-border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+    }
+
+    [data-theme="dark"] {
+      --bg-main: linear-gradient(165deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      --board-bg: #0f172a;
+      --cell-bg: #334155;
+      --cell-bg-hover: #475569;
+      --x-color: #f87171;
+      --o-color: #60a5fa;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+      --shadow-soft: var(--shadow-xl);
+      --shadow-soft-inner: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --app-bg: rgba(15, 23, 42, 0.96);
+      --app-border: rgba(51, 65, 85, 0.8);
+      --player-tag-bg: rgba(30, 41, 59, 0.9);
+      --player-tag-border: rgba(71, 85, 105, 0.6);
+      --input-bg: #1e293b;
+      --input-border: #475569;
+    }
+
+    [data-theme="dark"] .cell {
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    [data-theme="dark"] .cell.win {
+      background: linear-gradient(135deg, #422006, #78350f);
+      color: #fcd34d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      color: var(--text-primary);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .app {
+      background: var(--app-bg);
+      border-radius: var(--radius-xl);
+      padding: 12px 14px 14px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--app-border);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+
+    #streak-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    #bestStreakDisplay {
+      font-weight: 700;
+      white-space: nowrap;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: rgba(251, 191, 36, 0.15);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(217, 119, 6, 0.4);
+      box-shadow: var(--shadow-sm);
+      transition: color 0.3s ease;
+    }
+
+    #currentStreakDisplay {
+      margin-left: auto;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-primary);
+      background: rgba(251, 191, 36, 0.12);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(217, 119, 6, 0.35);
+      box-shadow: var(--shadow-sm);
+      transition: color 0.3s ease;
+    }
+
+    .name-button {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: var(--cell-bg);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .name-button:hover {
+      background: var(--cell-bg-hover);
+      border-color: var(--accent);
+    }
+
+    #players {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+
+    .name-bar-info {
+      align-self: stretch;
+      min-width: 36px;
+      padding: 0 10px;
+    }
+
+    .player-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--player-tag-bg);
+      border-radius: var(--radius-lg);
+      padding: 6px 12px 6px 8px;
+      border: 1px solid var(--player-tag-border);
+      box-shadow: var(--shadow-sm);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .player-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .player-dot.X-dot {
+      background: rgba(220, 38, 38, 0.12);
+      border: 1px solid rgba(220, 38, 38, 0.4);
+      color: var(--x-color);
+    }
+
+    .player-dot.O-dot {
+      background: rgba(37, 99, 235, 0.12);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      color: var(--o-color);
+    }
+
+    .player-name-input {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      padding: 6px 12px;
+      font-size: 13px;
+      min-width: 130px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+
+    .player-name-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    #statusRow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      min-height: 36px;
+      text-align: center;
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    #statusRow.status-your-turn {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      animation: statusPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes statusPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.2); }
+      50% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.08); }
+    }
+
+    #statusRow.status-computer-turn {
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    #statusRow.status-neutral {
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    [data-theme="dark"] #statusRow.status-your-turn {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    [data-theme="dark"] #statusRow.status-computer-turn {
+      background: rgba(148, 163, 184, 0.1);
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    #status {
+      font-size: 15px;
+      text-align: center;
+      font-weight: 500;
+      flex: 1;
+      width: 100%;
+    }
+
+    #shareGameResultBtn {
+      visibility: hidden;
+      pointer-events: none;
+      width: 0;
+      min-width: 0;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      border: none;
+    }
+
+    #shareGameResultBtn.visible {
+      visibility: visible;
+      pointer-events: auto;
+      width: auto;
+      min-width: 36px;
+      padding: 0 10px;
+      margin: 0;
+      overflow: visible;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    #shareGameResultBtn.visible:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    #status .mark-X {
+      color: var(--x-color);
+      font-weight: 700;
+    }
+
+    #status .mark-O {
+      color: var(--o-color);
+      font-weight: 700;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .icon-button {
+      padding: 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: var(--cell-bg);
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      min-width: 36px;
+      box-sizing: border-box;
+    }
+
+    .icon-button.name-bar-info {
+      height: auto;
+      min-height: 34px;
+      align-self: stretch;
+    }
+
+    .icon-button:hover {
+      background: var(--cell-bg-hover);
+      border-color: var(--accent);
+    }
+
+    .icon-button:active {
+      transform: scale(0.98);
+    }
+
+    .icon-button.muted {
+      opacity: 0.5;
+    }
+
+    .icon-button.muted:hover {
+      opacity: 0.7;
+    }
+
+    /* Stats Modal */
+    #statsModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #statsModal.show {
+      display: flex;
+    }
+
+    #statsContent {
+      background: var(--app-bg);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--app-border);
+      color: var(--text-primary);
+    }
+
+    #statsContent h2 {
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    #statsColumns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .stats-column h3 {
+      margin: 0 0 14px 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--input-border);
+    }
+
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--input-border);
+    }
+
+    .stat-item:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .stat-value {
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    #closeStats {
+      margin-top: 16px;
+      width: 100%;
+    }
+
+    /* Achievements */
+    .achievements-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 2px solid var(--input-border);
+    }
+
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .achievement-item {
+      background: var(--player-tag-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      text-align: center;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .achievement-item.unlocked {
+      border-color: rgba(251, 191, 36, 0.5);
+      background: rgba(251, 191, 36, 0.08);
+      box-shadow: var(--shadow-md);
+    }
+
+    .achievement-item.locked {
+      opacity: 0.45;
+      filter: grayscale(100%);
+    }
+
+    .achievement-icon {
+      font-size: 32px;
+      margin-bottom: 6px;
+    }
+
+    .achievement-name {
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .achievement-desc {
+      font-size: 10px;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    /* Achievements Modal */
+    #trophyModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #trophyModal.show {
+      display: flex;
+    }
+
+    #trophyContent {
+      background: var(--app-bg);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--app-border);
+      color: var(--text-primary);
+    }
+
+    #trophyContent h2 {
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .achievement-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--app-bg);
+      border: 1px solid rgba(251, 191, 36, 0.5);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-lg);
+      z-index: 3000;
+      animation: slideInRight 0.5s ease-out;
+      max-width: 300px;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .achievement-notification-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .achievement-notification-icon {
+      font-size: 24px;
+    }
+
+    .achievement-notification-title {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .achievement-notification-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Share modal (fallback when Web Share API unavailable) */
+    #shareModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #shareModal.show {
+      display: flex;
+    }
+
+    #shareModalContent {
+      background: var(--app-bg);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      max-width: 360px;
+      width: 90%;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--app-border);
+      color: var(--text-primary);
+    }
+
+    #shareModalContent h3 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      text-align: center;
+      color: var(--text-primary);
+    }
+
+    /* Registration/Login Modal */
+    #registerModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #registerModal.show {
+      display: flex;
+    }
+
+    #registerModalContent {
+      background: var(--app-bg);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      max-width: 360px;
+      width: 90%;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--app-border);
+      color: var(--text-primary);
+    }
+
+    #registerModalContent h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .share-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .share-buttons a,
+    .share-buttons button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--text-primary);
+      background: var(--cell-bg);
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .share-buttons a:hover,
+    .share-buttons button:hover {
+      background: var(--cell-bg-hover);
+      border-color: var(--accent);
+    }
+
+    #shareModalClose {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    /* Confetti container */
+    #confettiContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1500;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ffd700;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Smooth piece placement */
+    .cell.placing {
+      animation: placePiece 0.3s ease-out;
+    }
+
+    @keyframes placePiece {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    button:not(.icon-button):not(.name-button) {
+      padding: 8px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      box-sizing: border-box;
+    }
+
+    button:not(.icon-button):not(.name-button):hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    button:not(.icon-button):not(.name-button):active {
+      transform: translateY(0);
+    }
+
+    #board-wrapper {
+      background: var(--board-bg);
+      padding: 7px 9px 7px 7px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft-inner);
+      width: fit-content;
+      margin: 0 auto;
+      max-width: 100%;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(9, 44px);
+      grid-template-rows: repeat(9, 44px);
+      gap: 4px;
+      width: fit-content;
+    }
+
+    .cell {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cell-bg);
+      cursor: pointer;
+      font-size: 26px;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      transition: all 0.2s ease;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.6), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+
+    .cell:hover {
+      background: var(--cell-bg-hover);
+      transform: scale(1.02);
+      box-shadow: var(--shadow-md);
+    }
+
+    .cell:hover::after {
+      opacity: 1;
+    }
+
+    .cell.X {
+      color: var(--x-color);
+      animation: popIn 0.2s ease-out;
+    }
+
+    .cell.O {
+      color: var(--o-color);
+      animation: popIn 0.2s ease-out;
+    }
+
+    .cell.last-move {
+      box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.6);
+    }
+
+    .cell.preview-X::before,
+    .cell.preview-O::before {
+      content: attr(data-preview);
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 700;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .cell.preview-X::before {
+      color: var(--x-color);
+    }
+
+    .cell.preview-O::before {
+      color: var(--o-color);
+    }
+
+    .cell.win {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.5);
+      color: #92400e;
+      animation: pulseWin 1s ease-in-out infinite;
+    }
+
+    @keyframes pulseWin {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.85), 0 5px 14px rgba(180, 83, 9, 0.6);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 1), 0 7px 20px rgba(180, 83, 9, 0.8);
+      }
+    }
+
+    #contactLink {
+      display: block;
+      text-align: center;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      opacity: 0.75;
+      transition: opacity 0.2s ease;
+    }
+
+    #contactLink:hover {
+      text-decoration: underline;
+      opacity: 1;
+    }
+
+    #themeToggle {
+      padding: 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: var(--cell-bg);
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 36px;
+    }
+
+    #themeToggle:hover {
+      background: var(--cell-bg-hover);
+      border-color: var(--accent);
+    }
+
+    #themeToggle:active {
+      transform: scale(0.98);
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.2);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3), 0 6px 16px rgba(180, 83, 9, 0.5);
+      }
+      to {
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.8), 0 7px 20px rgba(180, 83, 9, 0.75);
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 600px) {
+      body {
+        padding: 8px;
+        align-items: flex-start;
+        padding-top: 12px;
+      }
+
+      .app {
+        padding: 6px 8px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      h1 {
+        font-size: 18px;
+      }
+
+      #streak-bar {
+        font-size: 10px;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      #bestStreakDisplay {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      #currentStreakDisplay {
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+
+      #bestStreakDisplay {
+        font-size: 12px;
+        padding: 3px 8px;
+      }
+
+      #currentStreakDisplay {
+        font-size: 14px;
+        padding: 2px 8px;
+      }
+
+      #board-wrapper {
+        padding: 4px 6px 4px 4px;
+        overflow-x: auto;
+      }
+
+      #board {
+        grid-template-columns: repeat(9, min(32px, calc((100vw - 80px) / 9)));
+        grid-template-rows: repeat(9, min(32px, calc((100vw - 80px) / 9)));
+        gap: 2px;
+      }
+
+      .cell {
+        width: 100%;
+        height: 100%;
+        font-size: 18px;
+        border-radius: 6px;
+      }
+
+      #status {
+        font-size: 13px;
+      }
+
+      button {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .player-name-input {
+        min-width: 100px;
+        font-size: 11px;
+      }
+
+      .name-button {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+
+      #statsContent {
+        max-width: 95%;
+        padding: 16px;
+      }
+
+      #statsColumns {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .stats-column h3 {
+        font-size: 13px;
+      }
+
+      .stat-item {
+        padding: 8px 0;
+        font-size: 13px;
+      }
+
+      .achievements-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+      }
+
+      .achievement-item {
+        padding: 8px;
+      }
+
+      .achievement-icon {
+        font-size: 24px;
+      }
+
+      .achievement-name {
+        font-size: 11px;
+      }
+
+      .achievement-desc {
+        font-size: 9px;
+      }
+
+      #trophyContent {
+        max-width: 95%;
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      #board {
+        grid-template-columns: repeat(9, min(28px, calc((100vw - 60px) / 9)));
+        grid-template-rows: repeat(9, min(28px, calc((100vw - 60px) / 9)));
+        gap: 2px;
+      }
+
+      .cell {
+        font-size: 16px;
+      }
+
+      h1 {
+        font-size: 16px;
+      }
+
+      #streak-bar {
+        font-size: 9px;
+      }
+
+      #bestStreakDisplay {
+        font-size: 11px;
+        padding: 2px 6px;
+      }
+
+      #currentStreakDisplay {
+        font-size: 12px;
+        padding: 2px 6px;
+      }
+    }
+
+    @media (min-width: 601px) and (max-width: 900px) {
+      #board {
+        grid-template-columns: repeat(9, min(38px, calc((100vw - 120px) / 9)));
+        grid-template-rows: repeat(9, min(38px, calc((100vw - 120px) / 9)));
+      }
+
+      .cell {
+        font-size: 22px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .app {
+        max-width: 600px;
+      }
+    }
+  </style>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="app">
+    <div id="streak-bar">
+      <div id="bestStreakDisplay">Best streak: none</div>
+      <div id="currentStreakDisplay">Streak: 0</div>
+    </div>
+
+    <h1>5-in-a-Row</h1>
+
+    <div id="players">
+      <div class="player-tag">
+        <div class="player-dot X-dot">🧑</div>
+        <input
+          id="humanName"
+          class="player-name-input"
+          type="text"
+          placeholder="Your name"
+        />
+        <button id="applyHumanName" class="name-button" type="button">Set</button>
+      </div>
+      <button id="shareGameResultBtn" class="icon-button name-bar-info" aria-label="Share result" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.82 3.98"/><path d="m15.41 6.51-6.82 3.98"/></svg></button>
+    </div>
+
+    <!-- Registration/Login Modal -->
+    <div id="registerModal">
+      <div id="registerModalContent">
+        <h3 id="registerModalTitle">Register Name</h3>
+        <div id="registerModalMessage" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; text-align: center;"></div>
+        <input
+          id="registerPassword"
+          type="password"
+          class="player-name-input"
+          placeholder="Enter password"
+          style="width: 100%; margin-bottom: 10px;"
+        />
+        <div style="display: flex; gap: 8px; flex-direction: column;">
+          <div style="display: flex; gap: 8px;">
+            <button id="registerConfirmBtn" class="button" style="flex: 1;">Register</button>
+            <button id="registerCancelBtn" class="icon-button" style="flex: 1;">Cancel</button>
+          </div>
+          <button id="registerSkipBtn" class="icon-button" style="margin-top: 4px; font-size: 12px; padding: 4px 8px;">Play without registering</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="statusRow">
+      <div id="status">Ready to play</div>
+    </div>
+
+    <div id="controls">
+      <button id="restartBtn" title="Restart game (R or Space)">Restart game</button>
+      <button id="statsBtn" class="icon-button" aria-label="Statistics">📈</button>
+      <button id="trophyBtn" class="icon-button" aria-label="Achievements">🏆</button>
+      <button id="soundToggle" class="icon-button" aria-label="Toggle sound">🎵</button>
+      <button id="themeToggle" class="icon-button" aria-label="Toggle theme">🌙</button>
+    </div>
+
+    <div id="board-wrapper">
+      <div id="board"></div>
+    </div>
+
+    <a id="contactLink" href="mailto:stevan.toncic@gmail.com">✉ Contact</a>
+  </div>
+
+  <!-- Stats Modal -->
+  <div id="statsModal">
+    <div id="statsContent">
+      <h2>Statistics</h2>
+      <div id="statsColumns">
+        <div class="stats-column">
+          <h3 id="currentPlayerName">Current Player</h3>
+          <div class="stat-item">
+            <span class="stat-label">Games Played:</span>
+            <span class="stat-value" id="statCurrentGamesPlayed">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Wins:</span>
+            <span class="stat-value" id="statCurrentWins">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Losses:</span>
+            <span class="stat-value" id="statCurrentLosses">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Draws:</span>
+            <span class="stat-value" id="statCurrentDraws">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Win Rate:</span>
+            <span class="stat-value" id="statCurrentWinRate">0%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Current Streak:</span>
+            <span class="stat-value" id="statCurrentStreak">0</span>
+          </div>
+        </div>
+        <div class="stats-column">
+          <h3>All Players</h3>
+          <div class="stat-item">
+            <span class="stat-label">Games Played:</span>
+            <span class="stat-value" id="statGlobalGamesPlayed">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Wins:</span>
+            <span class="stat-value" id="statGlobalWins">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Losses:</span>
+            <span class="stat-value" id="statGlobalLosses">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Draws:</span>
+            <span class="stat-value" id="statGlobalDraws">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Win Rate:</span>
+            <span class="stat-value" id="statGlobalWinRate">0%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Best Streak:</span>
+            <span class="stat-value" id="statGlobalBestStreak">0</span>
+          </div>
+        </div>
+      </div>
+      <button id="closeStats" class="icon-button" style="margin-top: 16px; width: 100%;">Close</button>
+    </div>
+  </div>
+
+  <!-- Achievements Modal -->
+  <div id="trophyModal">
+    <div id="trophyContent">
+      <h2>🏆 Achievements</h2>
+      <div style="text-align: center; margin-bottom: 16px; color: var(--text-secondary); font-size: 13px;">
+        Unlocked: <span id="trophyUnlockedCount">0</span>/8
+      </div>
+      <div class="achievements-grid" id="trophyAchievementsGrid"></div>
+      <div id="achievementsShareRow" style="display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; justify-content: center;">
+        <button id="shareAchievementsBtn" class="button" type="button">Share my achievements</button>
+      </div>
+      <button id="closeTrophy" class="icon-button" style="margin-top: 16px; width: 100%;">Close</button>
+    </div>
+  </div>
+
+  <!-- Achievement Notification -->
+  <div id="achievementNotification" style="display: none;"></div>
+
+  <!-- Share Modal (fallback when native share unavailable) -->
+  <div id="shareModal">
+    <div id="shareModalContent">
+      <h3 id="shareModalTitle">Share</h3>
+      <div class="share-buttons" id="shareButtons"></div>
+      <button id="shareModalClose" class="icon-button">Close</button>
+    </div>
+  </div>
+
+  <!-- Confetti Container -->
+  <div id="confettiContainer"></div>
+
+  <script>
+    const BOARD_SIZE = 9;
+    const WIN_LENGTH = 5;
+
+    // ============================================
+    // FIREBASE CONFIGURATION
+    // ============================================
+    // TODO: Replace this with your Firebase config from Firebase Console
+    // Get it from: Firebase Console → Project Settings → Your apps → Config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase (only if config is provided)
+    let db = null;
+    let firebaseInitialized = false;
+    
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+      try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        firebaseInitialized = true;
+        console.log("Firebase initialized successfully!");
+      } catch (error) {
+        console.error("Firebase initialization error:", error);
+      }
+    } else {
+      console.warn("Firebase not configured. Global best streak will use localStorage.");
+    }
+
+    const boardElem = document.getElementById("board");
+    const statusElem = document.getElementById("status");
+    const statusRow = document.getElementById("statusRow");
+    const restartBtn = document.getElementById("restartBtn");
+    const themeToggleBtn = document.getElementById("themeToggle");
+    const statsBtn = document.getElementById("statsBtn");
+    const trophyBtn = document.getElementById("trophyBtn");
+    const soundToggleBtn = document.getElementById("soundToggle");
+    const statsModal = document.getElementById("statsModal");
+    const trophyModal = document.getElementById("trophyModal");
+    const closeStatsBtn = document.getElementById("closeStats");
+    const closeTrophyBtn = document.getElementById("closeTrophy");
+    const confettiContainer = document.getElementById("confettiContainer");
+    const achievementNotification = document.getElementById("achievementNotification");
+    const shareGameResultBtn = document.getElementById("shareGameResultBtn");
+    const shareAchievementsBtn = document.getElementById("shareAchievementsBtn");
+    const shareModal = document.getElementById("shareModal");
+    const shareModalClose = document.getElementById("shareModalClose");
+    const shareButtons = document.getElementById("shareButtons");
+    const shareModalTitle = document.getElementById("shareModalTitle");
+    const humanNameInput = document.getElementById("humanName");
+    const currentStreakElem = document.getElementById("currentStreakDisplay");
+    const bestStreakElem = document.getElementById("bestStreakDisplay");
+    const applyHumanNameBtn = document.getElementById("applyHumanName");
+    const registerModal = document.getElementById("registerModal");
+    const registerModalContent = document.getElementById("registerModalContent");
+    const registerModalTitle = document.getElementById("registerModalTitle");
+    const registerModalMessage = document.getElementById("registerModalMessage");
+    const registerPassword = document.getElementById("registerPassword");
+    const registerConfirmBtn = document.getElementById("registerConfirmBtn");
+    const registerCancelBtn = document.getElementById("registerCancelBtn");
+    const registerSkipBtn = document.getElementById("registerSkipBtn");
+
+    let pendingName = "";
+    let isLoginMode = false;
+
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function checkNameRegistered(name) {
+      if (!firebaseInitialized || !db) return false;
+      try {
+        const doc = await db.collection("registeredNames").doc(name.toLowerCase()).get();
+        return doc.exists;
+      } catch (error) {
+        console.error("Error checking name:", error);
+        return false;
+      }
+    }
+
+    async function registerName(name, password) {
+      if (!firebaseInitialized || !db) {
+        alert("Registration requires Firebase. Please configure Firebase to use this feature.");
+        return false;
+      }
+      try {
+        const nameLower = name.toLowerCase();
+        const passwordHash = await hashPassword(password);
+        await db.collection("registeredNames").doc(nameLower).set({
+          name: name,
+          passwordHash: passwordHash,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        return true;
+      } catch (error) {
+        console.error("Error registering name:", error);
+        alert("Failed to register name. Please try again.");
+        return false;
+      }
+    }
+
+    async function verifyPassword(name, password) {
+      if (!firebaseInitialized || !db) return false;
+      try {
+        const nameLower = name.toLowerCase();
+        const doc = await db.collection("registeredNames").doc(nameLower).get();
+        if (!doc.exists) return false;
+        const passwordHash = await hashPassword(password);
+        return doc.data().passwordHash === passwordHash;
+      } catch (error) {
+        console.error("Error verifying password:", error);
+        return false;
+      }
+    }
+
+    function showRegisterModal(name, isLogin = false) {
+      pendingName = name;
+      isLoginMode = isLogin;
+      registerModalTitle.textContent = isLogin ? "Login" : "Register Name";
+      registerModalMessage.textContent = isLogin
+        ? `The name "${name}" is already registered. Enter password to play.`
+        : `Register "${name}" with a password to protect it.`;
+      registerPassword.value = "";
+      registerPassword.focus();
+      registerSkipBtn.style.display = isLogin ? "none" : "block";
+      registerModal.classList.add("show");
+    }
+
+    function hideRegisterModal() {
+      registerModal.classList.remove("show");
+      pendingName = "";
+      registerPassword.value = "";
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function setStatusWithMark(name, player, suffix) {
+      const cls = player === "X" ? "mark-X" : "mark-O";
+      statusElem.innerHTML = escapeHtml(name) + ` (<span class="${cls}">${player}</span>)${suffix}`;
+    }
+
+    let board;
+    let currentPlayer;
+    let gameOver;
+    let humanPlayer;
+    let computerPlayer;
+    let nextHumanPlayer = "X"; // alternates between X and O each game
+    let computerThinking = false;
+    let computerMoveTimeoutId = null;
+    let currentStreak = 0;
+    let bestStreak = 0;
+    let bestStreakName = "";
+    let soundEnabled = true;
+    let currentPlayerName = "";
+    
+    // Statistics
+    let currentPlayerStats = {
+      gamesPlayed: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0
+    };
+    
+    let globalStats = {
+      gamesPlayed: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0
+    };
+
+    // Achievements
+    const achievements = {
+      firstWin: { id: "firstWin", name: "First Win", description: "Win your first game", icon: "🏆", unlocked: false },
+      perfectGame: { id: "perfectGame", name: "Perfect Game", description: "Win without opponent getting 4 in a row", icon: "✨", unlocked: false },
+      comebackKing: { id: "comebackKing", name: "Comeback King", description: "Win after opponent had 4 in a row", icon: "👑", unlocked: false },
+      streakMaster: { id: "streakMaster", name: "Streak Master", description: "Reach 5+ win streak", icon: "🔥", unlocked: false },
+      speedDemon: { id: "speedDemon", name: "Speed Demon", description: "Win in under 20 moves", icon: "⚡", unlocked: false },
+      defender: { id: "defender", name: "Defender", description: "Block 3+ winning attempts in one game", icon: "🛡️", unlocked: false },
+      centurion: { id: "centurion", name: "Centurion", description: "Play 100 games", icon: "💯", unlocked: false },
+      unstoppable: { id: "unstoppable", name: "Unstoppable", description: "Win 10 games in a row", icon: "🚀", unlocked: false }
+    };
+
+    // Game state for achievement tracking
+    let gameState = {
+      moveCount: 0,
+      blocksThisGame: 0,
+      opponentMaxInRow: 0,
+      opponentHad4InRow: false,
+      playerHad4InRow: false
+    };
+
+    let lastGameResultText = ""; // For sharing game result
+
+    function createEmptyBoard() {
+      return Array.from({ length: BOARD_SIZE }, () =>
+        Array.from({ length: BOARD_SIZE }, () => "")
+      );
+    }
+
+    function initBoardUI() {
+      boardElem.innerHTML = "";
+      // Grid sizing is handled by CSS for responsiveness
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.addEventListener("click", onCellClick);
+          cell.addEventListener("mouseenter", onCellMouseEnter);
+          cell.addEventListener("mouseleave", onCellMouseLeave);
+          boardElem.appendChild(cell);
+        }
+      }
+    }
+
+    function clearHighlights() {
+      document
+        .querySelectorAll(".cell.last-move, .cell.win")
+        .forEach(cell => {
+          cell.classList.remove("last-move", "win");
+        });
+    }
+
+    function onCellClick(e) {
+      if (gameOver || computerThinking) return;
+
+      // Only allow clicks when it's the human player's turn
+      if (currentPlayer !== humanPlayer) return;
+      if (!hasHumanName()) return;
+
+      const cell = e.currentTarget;
+      const r = parseInt(cell.dataset.row, 10);
+      const c = parseInt(cell.dataset.col, 10);
+
+      if (board[r][c] !== "") {
+        return;
+      }
+
+      handleMove(r, c, false);
+    }
+
+    function onCellMouseEnter(e) {
+      const cell = e.currentTarget;
+      const r = parseInt(cell.dataset.row, 10);
+      const c = parseInt(cell.dataset.col, 10);
+      if (!board || board[r][c] !== "" || currentPlayer !== humanPlayer || gameOver || computerThinking || !hasHumanName()) return;
+      const cls = humanPlayer === "X" ? "preview-X" : "preview-O";
+      cell.classList.add(cls);
+      cell.dataset.preview = humanPlayer;
+    }
+
+    function onCellMouseLeave(e) {
+      const cell = e.currentTarget;
+      cell.classList.remove("preview-X", "preview-O");
+      delete cell.dataset.preview;
+    }
+
+    function getHumanDisplayName() {
+      const raw = humanNameInput.value.trim();
+      return raw || "You";
+    }
+
+    function getComputerDisplayName() {
+      return "Computer";
+    }
+
+    function hasHumanName() {
+      return humanNameInput.value.trim().length > 0;
+    }
+
+    function handleMove(r, c, isComputer) {
+      if (gameOver) return;
+
+      // Track if this is a blocking move (check before placing)
+      if (isComputer && currentPlayer === computerPlayer) {
+        // Check if computer is blocking human's potential win
+        if (checkIfBlockingMove(board, r, c, humanPlayer)) {
+          gameState.blocksThisGame++;
+        }
+      }
+
+      board[r][c] = currentPlayer;
+      gameState.moveCount++;
+
+      // Track max line lengths
+      if (isComputer) {
+        const computerMax = getMaxLineLength(board, computerPlayer);
+        gameState.opponentMaxInRow = Math.max(gameState.opponentMaxInRow, computerMax);
+        if (computerMax >= 4) {
+          gameState.opponentHad4InRow = true;
+        }
+      } else {
+        const humanMax = getMaxLineLength(board, humanPlayer);
+        if (humanMax >= 4) {
+          gameState.playerHad4InRow = true;
+        }
+      }
+
+      clearHighlights();
+      const allCells = document.querySelectorAll(".cell");
+      allCells.forEach(cell => {
+        if (!cell.classList.contains("win")) {
+          cell.classList.remove("last-move");
+        }
+      });
+
+      const cell = document.querySelector(
+        `.cell[data-row="${r}"][data-col="${c}"]`
+      );
+      if (cell) {
+        // Smooth placement animation
+        cell.classList.add("placing");
+        setTimeout(() => {
+          cell.classList.remove("placing");
+        }, 300);
+        
+        cell.textContent = currentPlayer;
+        cell.classList.add(currentPlayer, "last-move");
+        
+        // Play placement sound
+        playSound("place");
+      }
+
+      const winLine = getWinningLine(board, r, c, currentPlayer);
+      if (winLine) {
+        gameOver = true;
+        currentPlayerStats.gamesPlayed++;
+        globalStats.gamesPlayed++;
+        
+        highlightWinningLine(winLine);
+        if (isComputer) {
+          setStatusWithMark(getComputerDisplayName(), currentPlayer, " wins!");
+          statusRow.className = "status-neutral";
+          lastGameResultText = `I just lost in 5-in-a-Row. My streak was ${currentStreak}. Can you do better?`;
+          currentStreak = 0;
+          currentPlayerStats.losses++;
+          globalStats.losses++;
+          playSound("aw");
+        } else {
+          const winnerName = getHumanDisplayName();
+          setStatusWithMark(winnerName, currentPlayer, " wins!");
+          statusRow.className = "status-neutral";
+          currentStreak += 1;
+          currentPlayerStats.wins++;
+          globalStats.wins++;
+          if (currentStreak > bestStreak) {
+            bestStreak = currentStreak;
+            bestStreakName = winnerName;
+            saveBestStreak();
+          }
+          playSound("applause");
+          createConfetti();
+          lastGameResultText = `I just won in 5-in-a-Row! Streak: ${currentStreak}. Try to beat me!`;
+          // Check win-specific achievements
+          checkWinAchievements();
+        }
+        // Check all achievements
+        checkAchievements();
+        saveStats();
+        updateStreakDisplays();
+        shareGameResultBtn.classList.add("visible");
+        computerThinking = false;
+        resetGameState();
+        return;
+      }
+
+      if (boardFull(board)) {
+        gameOver = true;
+        currentPlayerStats.gamesPlayed++;
+        currentPlayerStats.draws++;
+        globalStats.gamesPlayed++;
+        globalStats.draws++;
+        statusElem.textContent = "It's a draw!";
+        statusRow.className = "status-neutral";
+        playSound("draw");
+        lastGameResultText = `I just played a draw in 5-in-a-Row. Streak: ${currentStreak}. Give it a try!`;
+        checkAchievements();
+        saveStats();
+        shareGameResultBtn.classList.add("visible");
+        computerThinking = false;
+        resetGameState();
+        return;
+      }
+
+      // Switch turns
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+      // Decide whose turn it is next and update status with names
+      if (currentPlayer === humanPlayer) {
+        const name = getHumanDisplayName();
+        setStatusWithMark(name, currentPlayer, " – your turn");
+        statusRow.className = "status-your-turn";
+        computerThinking = false;
+      } else {
+        setStatusWithMark(getComputerDisplayName(), currentPlayer, " is thinking...");
+        statusRow.className = "status-computer-turn";
+        computerThinking = true;
+        // 1 second delay before computer moves
+        if (computerMoveTimeoutId !== null) {
+          clearTimeout(computerMoveTimeoutId);
+        }
+        computerMoveTimeoutId = setTimeout(computerMove, 1000);
+      }
+    }
+
+    function computerMove() {
+      if (gameOver) {
+        computerThinking = false;
+        return;
+      }
+
+      // Don't let computer move if human name not set yet
+      if (!hasHumanName()) {
+        computerThinking = false;
+        return;
+      }
+
+      const moves = [];
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === "") {
+            moves.push([r, c]);
+          }
+        }
+      }
+
+      if (moves.length === 0) {
+        computerThinking = false;
+        return;
+      }
+
+      // First, always take immediate wins if available
+      for (const [r, c] of moves) {
+        board[r][c] = computerPlayer;
+        const winNow = getWinningLine(board, r, c, computerPlayer);
+        board[r][c] = "";
+        if (winNow) {
+          handleMove(r, c, true);
+          return;
+        }
+      }
+
+      // Then, always block immediate human wins if possible
+      for (const [r, c] of moves) {
+        board[r][c] = humanPlayer;
+        const humanWin = getWinningLine(board, r, c, humanPlayer);
+        board[r][c] = "";
+        if (humanWin) {
+          handleMove(r, c, true);
+          return;
+        }
+      }
+
+      let bestScore = -Infinity;
+      let bestMoves = [];
+      for (const [r, c] of moves) {
+        const score = scoreMove(r, c);
+        if (score > bestScore) {
+          bestScore = score;
+          bestMoves = [[r, c]];
+        } else if (score === bestScore) {
+          bestMoves.push([r, c]);
+        }
+      }
+
+      // Maximum difficulty: always choose the strongest move
+      const [r, c] = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+      handleMove(r, c, true);
+    }
+
+    function inBounds(r, c) {
+      return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
+    }
+
+    function collectLine(board, r, c, dr, dc, player) {
+      const cells = [[r, c]];
+
+      let nr = r + dr;
+      let nc = c + dc;
+      while (inBounds(nr, nc) && board[nr][nc] === player) {
+        cells.push([nr, nc]);
+        nr += dr;
+        nc += dc;
+      }
+
+      nr = r - dr;
+      nc = c - dc;
+      while (inBounds(nr, nc) && board[nr][nc] === player) {
+        cells.unshift([nr, nc]);
+        nr -= dr;
+        nc -= dc;
+      }
+
+      return cells;
+    }
+
+    function getWinningLine(board, r, c, player) {
+      const directions = [
+        [0, 1],  // horizontal
+        [1, 0],  // vertical
+        [1, 1],  // diagonal down-right
+        [1, -1], // diagonal down-left
+      ];
+
+      for (const [dr, dc] of directions) {
+        const cells = collectLine(board, r, c, dr, dc, player);
+        if (cells.length >= WIN_LENGTH) {
+          // limit to exactly WIN_LENGTH contiguous cells around last move
+          // (purely visual; game already won)
+          return cells.slice(0, WIN_LENGTH);
+        }
+      }
+      return null;
+    }
+
+    function highlightWinningLine(cells) {
+      cells.forEach(([r, c]) => {
+        const cell = document.querySelector(
+          `.cell[data-row="${r}"][data-col="${c}"]`
+        );
+        if (cell) {
+          cell.classList.add("win");
+        }
+      });
+    }
+
+    function boardFull(board) {
+      return board.every(row => row.every(cell => cell !== ""));
+    }
+
+    // ---- Achievement helpers ----
+
+    function getMaxLineLength(board, player) {
+      let maxLength = 0;
+      const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === player) {
+            for (const [dr, dc] of directions) {
+              const length = collectLine(board, r, c, dr, dc, player).length;
+              maxLength = Math.max(maxLength, length);
+            }
+          }
+        }
+      }
+      return maxLength;
+    }
+
+    function checkIfBlockingMove(board, r, c, threatenedPlayer) {
+      // Check if placing threatenedPlayer's piece here would create a win
+      // This means the current move is blocking that win
+      if (board[r][c] !== "") return false;
+      
+      board[r][c] = threatenedPlayer;
+      const wouldWin = getWinningLine(board, r, c, threatenedPlayer) !== null;
+      board[r][c] = "";
+      
+      return wouldWin;
+    }
+
+    function resetGameState() {
+      gameState = {
+        moveCount: 0,
+        blocksThisGame: 0,
+        opponentMaxInRow: 0,
+        opponentHad4InRow: false,
+        playerHad4InRow: false
+      };
+    }
+
+    // ---- Sound Effects ----
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      if (type === "applause") {
+        // Create a pleasant triumphant fanfare - ascending chord sequence
+        const notes = [
+          { freq: 523.25, delay: 0.0, duration: 0.15 },   // C5
+          { freq: 659.25, delay: 0.1, duration: 0.15 },   // E5
+          { freq: 783.99, delay: 0.2, duration: 0.15 },   // G5
+          { freq: 1046.50, delay: 0.3, duration: 0.25 },  // C6
+        ];
+        
+        notes.forEach((note, index) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.frequency.value = note.freq;
+          oscillator.type = "sine";
+          
+          const volume = 0.25;
+          const startTime = audioContext.currentTime + note.delay;
+          
+          gainNode.gain.setValueAtTime(0, startTime);
+          gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.02);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + note.duration);
+          
+          oscillator.start(startTime);
+          oscillator.stop(startTime + note.duration);
+        });
+        return;
+      }
+
+      if (type === "aw") {
+        // Create disappointed "aw" sound - descending tone
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = "sawtooth";
+        oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.5);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        return;
+      }
+
+      // Regular sounds
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      let frequency, duration, volume;
+
+      switch (type) {
+        case "place":
+          frequency = 440;
+          duration = 0.1;
+          volume = 0.3;
+          break;
+        case "win":
+          frequency = 523.25; // C5
+          duration = 0.3;
+          volume = 0.5;
+          break;
+        case "lose":
+          frequency = 220;
+          duration = 0.4;
+          volume = 0.4;
+          break;
+        case "draw":
+          frequency = 330;
+          duration = 0.25;
+          volume = 0.3;
+          break;
+        default:
+          return;
+      }
+
+      oscillator.frequency.value = frequency;
+      oscillator.type = "sine";
+
+      gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      soundToggleBtn.classList.toggle("muted", !soundEnabled);
+      localStorage.setItem("tictac9x9_sound", soundEnabled);
+    }
+
+    // ---- Confetti Animation ----
+
+    function createConfetti() {
+      const colors = ["#ffd700", "#ff6b6b", "#4ecdc4", "#45b7d1", "#f9ca24", "#f0932b", "#eb4d4b", "#6c5ce7"];
+      const confettiCount = 100;
+
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti";
+        confetti.style.left = Math.random() * 100 + "%";
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
+        confetti.style.animationDelay = Math.random() * 0.5 + "s";
+        confetti.style.opacity = "1";
+        confettiContainer.appendChild(confetti);
+
+        setTimeout(() => {
+          confetti.remove();
+        }, 5000);
+      }
+    }
+
+    // ---- Statistics ----
+
+    function loadStats() {
+      try {
+        const savedGlobal = localStorage.getItem("tictac9x9_global_stats");
+        if (savedGlobal) {
+          globalStats = JSON.parse(savedGlobal);
+        }
+        // Current player stats reset when name changes, so don't load them
+      } catch (e) {
+        // ignore errors
+      }
+    }
+
+    function saveStats() {
+      try {
+        localStorage.setItem("tictac9x9_global_stats", JSON.stringify(globalStats));
+        // Current player stats are not saved - they reset with name change
+      } catch (e) {
+        // ignore errors
+      }
+    }
+
+    function updateStatsDisplay() {
+      const currentName = getHumanDisplayName();
+      document.getElementById("currentPlayerName").textContent = currentName;
+      
+      // Current player stats (left column)
+      document.getElementById("statCurrentGamesPlayed").textContent = currentPlayerStats.gamesPlayed;
+      document.getElementById("statCurrentWins").textContent = currentPlayerStats.wins;
+      document.getElementById("statCurrentLosses").textContent = currentPlayerStats.losses;
+      document.getElementById("statCurrentDraws").textContent = currentPlayerStats.draws;
+      
+      const currentWinRate = currentPlayerStats.gamesPlayed > 0 
+        ? Math.round((currentPlayerStats.wins / currentPlayerStats.gamesPlayed) * 100) 
+        : 0;
+      document.getElementById("statCurrentWinRate").textContent = currentWinRate + "%";
+      
+      document.getElementById("statCurrentStreak").textContent = currentStreak;
+      
+      // Global stats (right column)
+      document.getElementById("statGlobalGamesPlayed").textContent = globalStats.gamesPlayed;
+      document.getElementById("statGlobalWins").textContent = globalStats.wins;
+      document.getElementById("statGlobalLosses").textContent = globalStats.losses;
+      document.getElementById("statGlobalDraws").textContent = globalStats.draws;
+      
+      const globalWinRate = globalStats.gamesPlayed > 0 
+        ? Math.round((globalStats.wins / globalStats.gamesPlayed) * 100) 
+        : 0;
+      document.getElementById("statGlobalWinRate").textContent = globalWinRate + "%";
+      
+      const globalBestStreakDisplay = bestStreak > 0 && bestStreakName 
+        ? `${bestStreak} (${bestStreakName})`
+        : bestStreak;
+      document.getElementById("statGlobalBestStreak").textContent = globalBestStreakDisplay;
+    }
+
+    function showStats() {
+      updateStatsDisplay();
+      statsModal.classList.add("show");
+    }
+
+    function hideStats() {
+      statsModal.classList.remove("show");
+    }
+
+    // ---- Achievements ----
+
+    function loadAchievements() {
+      try {
+        const saved = localStorage.getItem("tictac9x9_achievements");
+        if (saved) {
+          const savedAchievements = JSON.parse(saved);
+          Object.keys(achievements).forEach(key => {
+            if (savedAchievements[key] !== undefined) {
+              achievements[key].unlocked = savedAchievements[key];
+            }
+          });
+        }
+      } catch (e) {
+        // ignore errors
+      }
+    }
+
+    function saveAchievements() {
+      try {
+        const toSave = {};
+        Object.keys(achievements).forEach(key => {
+          toSave[key] = achievements[key].unlocked;
+        });
+        localStorage.setItem("tictac9x9_achievements", JSON.stringify(toSave));
+      } catch (e) {
+        // ignore errors
+      }
+    }
+
+    function checkAchievements() {
+      const newlyUnlocked = [];
+
+      // First Win
+      if (!achievements.firstWin.unlocked && currentPlayerStats.wins >= 1) {
+        achievements.firstWin.unlocked = true;
+        newlyUnlocked.push(achievements.firstWin);
+      }
+
+      // Streak Master
+      if (!achievements.streakMaster.unlocked && currentStreak >= 5) {
+        achievements.streakMaster.unlocked = true;
+        newlyUnlocked.push(achievements.streakMaster);
+      }
+
+      // Defender - checked after game
+      if (!achievements.defender.unlocked && gameState.blocksThisGame >= 3) {
+        achievements.defender.unlocked = true;
+        newlyUnlocked.push(achievements.defender);
+      }
+
+      // Centurion
+      if (!achievements.centurion.unlocked && globalStats.gamesPlayed >= 100) {
+        achievements.centurion.unlocked = true;
+        newlyUnlocked.push(achievements.centurion);
+      }
+
+      // Unstoppable
+      if (!achievements.unstoppable.unlocked && currentStreak >= 10) {
+        achievements.unstoppable.unlocked = true;
+        newlyUnlocked.push(achievements.unstoppable);
+      }
+
+      // Show notifications for newly unlocked achievements
+      newlyUnlocked.forEach(achievement => {
+        showAchievementNotification(achievement);
+      });
+
+      if (newlyUnlocked.length > 0) {
+        saveAchievements();
+        updateAchievementsDisplay();
+      }
+    }
+
+    function checkWinAchievements() {
+      const newlyUnlocked = [];
+
+      // Perfect Game - win without opponent getting 4 in a row
+      if (!achievements.perfectGame.unlocked && gameState.opponentMaxInRow < 4) {
+        achievements.perfectGame.unlocked = true;
+        newlyUnlocked.push(achievements.perfectGame);
+      }
+
+      // Comeback King - win after opponent had 4 in a row
+      if (!achievements.comebackKing.unlocked && gameState.opponentHad4InRow) {
+        achievements.comebackKing.unlocked = true;
+        newlyUnlocked.push(achievements.comebackKing);
+      }
+
+      // Speed Demon - win in under 20 moves
+      if (!achievements.speedDemon.unlocked && gameState.moveCount < 20) {
+        achievements.speedDemon.unlocked = true;
+        newlyUnlocked.push(achievements.speedDemon);
+      }
+
+      newlyUnlocked.forEach(achievement => {
+        showAchievementNotification(achievement);
+      });
+
+      if (newlyUnlocked.length > 0) {
+        saveAchievements();
+        updateAchievementsDisplay();
+      }
+    }
+
+    function showAchievementNotification(achievement) {
+      const notification = document.createElement("div");
+      notification.className = "achievement-notification";
+      notification.innerHTML = `
+        <div class="achievement-notification-header">
+          <span class="achievement-notification-icon">${achievement.icon}</span>
+          <span class="achievement-notification-title">Achievement Unlocked!</span>
+        </div>
+        <div class="achievement-notification-desc">
+          <strong>${achievement.name}</strong><br>${achievement.description}
+        </div>
+      `;
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.animation = "slideInRight 0.5s ease-out reverse";
+        setTimeout(() => {
+          notification.remove();
+        }, 500);
+      }, 3000);
+    }
+
+    function updateAchievementsDisplay() {
+      const unlockedCount = Object.values(achievements).filter(a => a.unlocked).length;
+      document.getElementById("trophyUnlockedCount").textContent = unlockedCount;
+
+      // Update achievements grid
+      const trophyGrid = document.getElementById("trophyAchievementsGrid");
+      trophyGrid.innerHTML = "";
+      Object.values(achievements).forEach(achievement => {
+        const item = createAchievementItem(achievement);
+        trophyGrid.appendChild(item);
+      });
+    }
+
+    function createAchievementItem(achievement) {
+      const item = document.createElement("div");
+      item.className = `achievement-item ${achievement.unlocked ? "unlocked" : "locked"}`;
+      item.innerHTML = `
+        <div class="achievement-icon">${achievement.icon}</div>
+        <div class="achievement-name">${achievement.name}</div>
+        <div class="achievement-desc">${achievement.description}</div>
+      `;
+      return item;
+    }
+
+    function showTrophyCabinet() {
+      updateAchievementsDisplay();
+      trophyModal.classList.add("show");
+    }
+
+    function hideTrophyCabinet() {
+      trophyModal.classList.remove("show");
+    }
+
+    // ---- Share ----
+    function getShareUrl() {
+      return window.location.href || "";
+    }
+
+    async function openShare(text, url) {
+      const shareUrl = url || getShareUrl();
+      const fullText = text ? `${text} ${shareUrl}` : shareUrl;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "5-in-a-Row",
+            text: text || "Check out 5-in-a-Row!",
+            url: shareUrl
+          });
+          return;
+        } catch (err) {
+          if (err.name === "AbortError") return;
+        }
+      }
+      showShareFallback(text, shareUrl);
+    }
+
+    function showShareFallback(title, url) {
+      const fullText = title ? `${title} ${url}` : url;
+      shareModalTitle.textContent = "Share";
+      shareButtons.innerHTML = "";
+
+      const networks = [
+        { name: "Twitter / X", icon: "𝕏", href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullText)}` },
+        { name: "Facebook", icon: "f", href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
+        { name: "WhatsApp", icon: "WhatsApp", href: `https://wa.me/?text=${encodeURIComponent(fullText)}` }
+      ];
+
+      networks.forEach(({ name, icon, href }) => {
+        const a = document.createElement("a");
+        a.href = href;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = `${icon} ${name}`;
+        shareButtons.appendChild(a);
+      });
+
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.textContent = "📋 Copy link";
+      copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(fullText).then(() => {
+          copyBtn.textContent = "✓ Copied!";
+          setTimeout(() => { copyBtn.textContent = "📋 Copy link"; }, 2000);
+        });
+      });
+      shareButtons.appendChild(copyBtn);
+
+      shareModal.classList.add("show");
+    }
+
+    function hideShareModal() {
+      shareModal.classList.remove("show");
+    }
+
+    // ---- Streak helpers ----
+
+    function updateStreakDisplays() {
+      currentStreakElem.textContent = `Streak: ${currentStreak}`;
+      if (bestStreak > 0 && bestStreakName) {
+        bestStreakElem.textContent = `Best streak: ${bestStreak} (${bestStreakName})`;
+      } else {
+        bestStreakElem.textContent = "Best streak: none";
+      }
+    }
+
+    async function saveBestStreak() {
+      // Only save to Firebase if it's a new record
+      if (firebaseInitialized && db && bestStreak > 0) {
+        try {
+          const recordRef = db.collection("globalBestStreak").doc("record");
+          const doc = await recordRef.get();
+          
+          // Only update if this is a new record
+          if (!doc.exists || doc.data().streak < bestStreak) {
+            await recordRef.set({
+              streak: bestStreak,
+              name: bestStreakName,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log("Global best streak updated in Firebase!");
+          }
+        } catch (error) {
+          console.error("Error saving to Firebase:", error);
+          // Fallback to localStorage
+          saveBestStreakLocal();
+        }
+      } else {
+        // Fallback to localStorage if Firebase not configured
+        saveBestStreakLocal();
+      }
+    }
+
+    function saveBestStreakLocal() {
+      try {
+        const data = { name: bestStreakName, streak: bestStreak };
+        localStorage.setItem("tictac9x9_best_streak", JSON.stringify(data));
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+
+    async function loadBestStreak() {
+      if (firebaseInitialized && db) {
+        try {
+          const doc = await db.collection("globalBestStreak").doc("record").get();
+          if (doc.exists) {
+            const data = doc.data();
+            if (data && typeof data.streak === "number" && typeof data.name === "string") {
+              bestStreak = data.streak;
+              bestStreakName = data.name;
+              updateStreakDisplays();
+              console.log("Global best streak loaded from Firebase:", data);
+              return;
+            }
+          }
+        } catch (error) {
+          console.error("Error loading from Firebase:", error);
+          // Fallback to localStorage
+          loadBestStreakLocal();
+        }
+      } else {
+        // Fallback to localStorage if Firebase not configured
+        loadBestStreakLocal();
+      }
+    }
+
+    function loadBestStreakLocal() {
+      try {
+        const raw = localStorage.getItem("tictac9x9_best_streak");
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (typeof data.streak === "number" && typeof data.name === "string") {
+          bestStreak = data.streak;
+          bestStreakName = data.name;
+        }
+      } catch (e) {
+        // ignore parse errors
+      }
+    }
+
+    // ---- AI evaluation helpers ----
+
+    function simulateLineLength(r, c, player, dr, dc) {
+      // Temporarily treat (r,c) as player's stone without mutating board
+      let count = 1;
+
+      let nr = r + dr;
+      let nc = c + dc;
+      while (inBounds(nr, nc) && (board[nr][nc] === player || (nr === r && nc === c))) {
+        if (board[nr][nc] !== "" || (nr === r && nc === c)) {
+          count++;
+        }
+        nr += dr;
+        nc += dc;
+      }
+
+      nr = r - dr;
+      nc = c - dc;
+      while (inBounds(nr, nc) && (board[nr][nc] === player || (nr === r && nc === c))) {
+        if (board[nr][nc] !== "" || (nr === r && nc === c)) {
+          count++;
+        }
+        nr -= dr;
+        nc -= dc;
+      }
+
+      return count;
+    }
+
+    function scoreMove(r, c) {
+      // Higher is better for computer
+      if (board[r][c] !== "") return -Infinity;
+
+      // 1) Immediate win for computer
+      board[r][c] = computerPlayer;
+      const winNow = getWinningLine(board, r, c, computerPlayer);
+      board[r][c] = "";
+      if (winNow) return 1_000_000;
+
+      // 2) Immediate block of human win
+      board[r][c] = humanPlayer;
+      const blockHumanWin = getWinningLine(board, r, c, humanPlayer);
+      board[r][c] = "";
+      if (blockHumanWin) return 900_000;
+
+      // 3) Positional heuristic: extend our lines and block opponent's
+      const directions = [
+        [0, 1],
+        [1, 0],
+        [1, 1],
+        [1, -1],
+      ];
+
+      let score = 0;
+
+      for (const [dr, dc] of directions) {
+        const ourLen = simulateLineLength(r, c, computerPlayer, dr, dc);
+        const theirLen = simulateLineLength(r, c, humanPlayer, dr, dc);
+
+        // Offensive weights: strongly prefer building 4s and 3s
+        if (ourLen >= WIN_LENGTH) {
+          score += 100_000;
+        } else if (ourLen === 4) {
+          score += 8_000;
+        } else if (ourLen === 3) {
+          score += 1_500;
+        } else if (ourLen === 2) {
+          score += 400;
+        } else if (ourLen === 1) {
+          score += 50;
+        }
+
+        // Defensive weights: block strong human lines
+        if (theirLen >= WIN_LENGTH) {
+          score += 90_000;
+        } else if (theirLen === 4) {
+          score += 7_000;
+        } else if (theirLen === 3) {
+          score += 1_200;
+        } else if (theirLen === 2) {
+          score += 350;
+        } else if (theirLen === 1) {
+          score += 40;
+        }
+      }
+
+      // Slight preference toward the center of the board
+      const center = (BOARD_SIZE - 1) / 2;
+      const distFromCenter = Math.abs(r - center) + Math.abs(c - center);
+      score += (BOARD_SIZE * 2 - distFromCenter) * 5;
+
+      return score;
+    }
+
+    function restartGame() {
+      startNewRound();
+    }
+
+    // ---- Theme management ----
+
+    function getTheme() {
+      return localStorage.getItem("tictac9x9_theme") || "light";
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem("tictac9x9_theme", theme);
+      themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+    }
+
+    function toggleTheme() {
+      const currentTheme = getTheme();
+      const newTheme = currentTheme === "light" ? "dark" : "light";
+      setTheme(newTheme);
+    }
+
+    // Initialize theme
+    setTheme(getTheme());
+    themeToggleBtn.addEventListener("click", toggleTheme);
+
+    // Initialize sound
+    const savedSound = localStorage.getItem("tictac9x9_sound");
+    if (savedSound !== null) {
+      soundEnabled = savedSound === "true";
+    }
+    soundToggleBtn.classList.toggle("muted", !soundEnabled);
+    soundToggleBtn.addEventListener("click", toggleSound);
+
+    // Stats modal
+    statsBtn.addEventListener("click", showStats);
+    closeStatsBtn.addEventListener("click", hideStats);
+    statsModal.addEventListener("click", (e) => {
+      if (e.target === statsModal) {
+        hideStats();
+      }
+    });
+
+    // Achievements modal
+    trophyBtn.addEventListener("click", showTrophyCabinet);
+    closeTrophyBtn.addEventListener("click", hideTrophyCabinet);
+    trophyModal.addEventListener("click", (e) => {
+      if (e.target === trophyModal) {
+        hideTrophyCabinet();
+      }
+    });
+
+    shareAchievementsBtn.addEventListener("click", () => {
+      const unlocked = Object.values(achievements).filter(a => a.unlocked).length;
+      const text = `I've unlocked ${unlocked}/8 achievements in 5-in-a-Row! Can you beat that?`;
+      openShare(text);
+    });
+
+    shareGameResultBtn.addEventListener("click", () => {
+      openShare(lastGameResultText);
+    });
+
+    shareModalClose.addEventListener("click", hideShareModal);
+    shareModal.addEventListener("click", (e) => {
+      if (e.target === shareModal) hideShareModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "r" || e.key === "R" || e.key === " ") {
+        const active = document.activeElement;
+        if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) return;
+        e.preventDefault();
+        restartGame();
+      }
+    });
+
+    restartBtn.addEventListener("click", restartGame);
+
+    applyHumanNameBtn.addEventListener("click", async () => {
+      const newName = humanNameInput.value.trim();
+      if (!newName) {
+        alert("Please enter your name before clicking Set.");
+        return;
+      }
+
+      const nameChanged = newName.toLowerCase() !== currentPlayerName.toLowerCase();
+
+      // If name changed and streak > 0, warn user that counter will reset
+      if (nameChanged && currentStreak > 0) {
+        const confirmed = confirm(
+          `Changing your name will reset your current streak of ${currentStreak}. Do you want to continue?`
+        );
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      // If Firebase is not configured, allow name without registration
+      if (!firebaseInitialized || !db) {
+        await completeNameSetup(newName);
+        return;
+      }
+
+      // Check if name is registered
+      const isRegistered = await checkNameRegistered(newName);
+      
+      if (isRegistered) {
+        // Name is registered - show login modal
+        showRegisterModal(newName, true);
+      } else {
+        // Name is not registered - show registration modal
+        showRegisterModal(newName, false);
+      }
+    });
+
+    async function completeNameSetup(name) {
+      const nameChanged = name.toLowerCase() !== currentPlayerName.toLowerCase();
+
+      // Reset streak and current player stats when name changes
+      if (nameChanged) {
+        currentStreak = 0;
+        currentPlayerStats = {
+          gamesPlayed: 0,
+          wins: 0,
+          losses: 0,
+          draws: 0
+        };
+        updateStreakDisplays();
+      }
+      
+      currentPlayerName = name;
+      
+      // Update status and potentially start/continue game
+      setStatusForTurn();
+      
+      // If it's computer's turn and name was just set, trigger computer move
+      if (currentPlayer === computerPlayer && !gameOver) {
+        computerThinking = true;
+        if (computerMoveTimeoutId !== null) {
+          clearTimeout(computerMoveTimeoutId);
+        }
+        computerMoveTimeoutId = setTimeout(computerMove, 1000);
+      }
+    }
+
+    registerConfirmBtn.addEventListener("click", async () => {
+      const password = registerPassword.value.trim();
+      if (!password) {
+        alert("Please enter a password.");
+        return;
+      }
+
+      if (isLoginMode) {
+        // Login: verify password
+        const isValid = await verifyPassword(pendingName, password);
+        if (isValid) {
+          hideRegisterModal();
+          await completeNameSetup(pendingName);
+        } else {
+          alert("Incorrect password. Please try again.");
+          registerPassword.value = "";
+          registerPassword.focus();
+        }
+      } else {
+        // Register: create new registration
+        if (password.length < 4) {
+          alert("Password must be at least 4 characters long.");
+          return;
+        }
+        const success = await registerName(pendingName, password);
+        if (success) {
+          hideRegisterModal();
+          await completeNameSetup(pendingName);
+        }
+      }
+    });
+
+    registerCancelBtn.addEventListener("click", hideRegisterModal);
+    registerSkipBtn.addEventListener("click", async () => {
+      hideRegisterModal();
+      await completeNameSetup(pendingName);
+    });
+    registerModal.addEventListener("click", (e) => {
+      if (e.target === registerModal) hideRegisterModal();
+    });
+
+    registerPassword.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        registerConfirmBtn.click();
+      }
+    });
+
+    function setStatusForTurn() {
+      if (!hasHumanName()) {
+        statusElem.textContent = "Enter your name above to start playing";
+        statusRow.className = "status-neutral";
+        return;
+      }
+
+      if (currentPlayer === humanPlayer) {
+        const name = getHumanDisplayName();
+        setStatusWithMark(name, currentPlayer, " – your turn");
+        statusRow.className = "status-your-turn";
+      } else {
+        setStatusWithMark(getComputerDisplayName(), currentPlayer, " is thinking...");
+        statusRow.className = "status-computer-turn";
+      }
+    }
+
+    function startNewRound() {
+      // Cancel any pending computer move
+      if (computerMoveTimeoutId !== null) {
+        clearTimeout(computerMoveTimeoutId);
+        computerMoveTimeoutId = null;
+      }
+
+      board = createEmptyBoard();
+      gameOver = false;
+      computerThinking = false;
+      resetGameState();
+
+      // Alternate which mark the human controls each game
+      humanPlayer = nextHumanPlayer;
+      computerPlayer = humanPlayer === "X" ? "O" : "X";
+      currentPlayer = "X"; // X always starts
+
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.classList.remove("X", "O", "last-move", "win");
+      });
+
+      shareGameResultBtn.classList.remove("visible");
+      updateStreakDisplays();
+
+      // Prepare status and possibly trigger computer's opening move
+      if (!hasHumanName()) {
+        statusElem.textContent = "Enter your name above to start playing";
+        statusRow.className = "status-neutral";
+      } else if (currentPlayer === humanPlayer) {
+        setStatusForTurn();
+      } else {
+        setStatusForTurn();
+        computerThinking = true;
+        computerMoveTimeoutId = setTimeout(computerMove, 1000);
+      }
+
+      // Flip for next game
+      nextHumanPlayer = nextHumanPlayer === "X" ? "O" : "X";
+    }
+
+    async function init() {
+      initBoardUI();
+      await loadBestStreak(); // Load global best streak from Firebase
+      loadStats();
+      loadAchievements();
+      updateAchievementsDisplay();
+      
+      // Set some pleasant defaults
+      humanNameInput.value = "";
+      updateStreakDisplays();
+      
+      // Show popup message at the beginning
+      alert("Welcome! Please enter your name and click 'Set' before you can start playing. The game cannot start until you fill in your name.");
+      
+      startNewRound();
+    }
+
+    init();
+  </script>
+</body>
+</html>
