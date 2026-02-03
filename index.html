@@ -2783,18 +2783,27 @@
 
       // Reset streak and current player stats when name changes, or force load stats
       if (nameChanged || forceLoadStats) {
+        console.log("completeNameSetup: nameChanged:", nameChanged, "forceLoadStats:", forceLoadStats, "name:", name);
         // Try to load player stats from Firestore first if registered
         let statsLoaded = false;
         if (firebaseInitialized && db) {
+          console.log("Checking if registered for stats loading:", name);
           const isRegistered = await checkNameRegistered(name);
+          console.log("Is registered?", isRegistered);
           if (isRegistered) {
+            console.log("Attempting to load player stats for:", name);
             statsLoaded = await loadPlayerStats(name);
-            console.log("Loaded player stats:", statsLoaded ? "success" : "failed", currentPlayerStats);
+            console.log("Stats loaded result:", statsLoaded, "currentPlayerStats:", currentPlayerStats, "currentStreak:", currentStreak);
+          } else {
+            console.log("User not registered, skipping stats load");
           }
+        } else {
+          console.log("Firebase not initialized or db not available");
         }
         
         // Only reset if we didn't load stats (new name or not registered)
         if (!statsLoaded) {
+          console.log("Stats not loaded, resetting to zero");
           currentStreak = 0;
           currentPlayerStats = {
             gamesPlayed: 0,
@@ -2802,10 +2811,13 @@
             losses: 0,
             draws: 0
           };
+        } else {
+          console.log("Stats loaded successfully, NOT resetting");
         }
         
         updateStreakDisplays();
         updateStatsDisplay(); // Update stats modal display
+        console.log("After updateStatsDisplay - currentPlayerStats:", currentPlayerStats);
       }
       
       currentPlayerName = name;
@@ -2866,6 +2878,11 @@
 
     registerCancelBtn.addEventListener("click", hideRegisterModal);
     registerSkipBtn.addEventListener("click", async () => {
+      if (!pendingName || !pendingName.trim()) {
+        console.log("Skip clicked but no pending name");
+        hideRegisterModal();
+        return;
+      }
       hideRegisterModal();
       await completeNameSetup(pendingName);
     });
