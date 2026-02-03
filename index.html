@@ -1562,10 +1562,22 @@
         .forEach(cell => {
           cell.classList.remove("last-move", "win");
         });
+      // Also clear all preview classes
+      document
+        .querySelectorAll(".cell.preview-X, .cell.preview-O")
+        .forEach(cell => {
+          cell.classList.remove("preview-X", "preview-O");
+          delete cell.dataset.preview;
+        });
     }
 
     function onCellClick(e) {
       if (gameOver || computerThinking) return;
+      
+      // Clear preview classes when clicking
+      const cell = e.currentTarget;
+      cell.classList.remove("preview-X", "preview-O");
+      delete cell.dataset.preview;
 
       // Only allow clicks when it's the human player's turn
       if (currentPlayer !== humanPlayer) return;
@@ -1645,6 +1657,9 @@
         if (!cell.classList.contains("win")) {
           cell.classList.remove("last-move");
         }
+        // Clear preview classes from all cells
+        cell.classList.remove("preview-X", "preview-O");
+        delete cell.dataset.preview;
       });
 
       const cell = document.querySelector(
@@ -1654,9 +1669,10 @@
         // Capture the player value before any async operations
         const playerToDisplay = currentPlayer;
         
-        // Clear any existing content and classes first
+        // Clear any existing content, classes, and preview classes
         cell.textContent = "";
-        cell.classList.remove("X", "O", "last-move", "placing");
+        cell.classList.remove("X", "O", "last-move", "placing", "preview-X", "preview-O");
+        delete cell.dataset.preview;
         
         // Set content and class immediately
         cell.textContent = playerToDisplay;
