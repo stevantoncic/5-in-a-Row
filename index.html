@@ -2090,15 +2090,26 @@
       try {
         localStorage.setItem("tictac9x9_global_stats", JSON.stringify(globalStats));
         
+        console.log("saveStats() called. currentPlayerName:", currentPlayerName, "firebaseInitialized:", firebaseInitialized, "db:", !!db);
+        
         // Save player stats to Firestore if user is registered
         if (currentPlayerName && firebaseInitialized && db) {
+          console.log("Checking if registered:", currentPlayerName);
           const isRegistered = await checkNameRegistered(currentPlayerName);
+          console.log("Is registered?", isRegistered);
           if (isRegistered) {
+            console.log("User is registered, saving stats...");
             await savePlayerStats(currentPlayerName);
+          } else {
+            console.log("User is NOT registered, skipping Firestore save");
           }
+        } else {
+          if (!currentPlayerName) console.log("No currentPlayerName, skipping save");
+          if (!firebaseInitialized) console.log("Firebase not initialized, skipping save");
+          if (!db) console.log("db not available, skipping save");
         }
       } catch (e) {
-        // ignore errors
+        console.error("Error in saveStats():", e);
       }
     }
 
