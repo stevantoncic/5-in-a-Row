@@ -97,56 +97,279 @@
     .app {
       background: var(--app-bg);
       border-radius: var(--radius-xl);
-      padding: 12px 14px 14px;
+      padding: 12px 8px 14px;
       box-shadow: var(--shadow-soft);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--app-border);
       transition: background 0.3s ease, border-color 0.3s ease;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* Mode Toggle Switch */
+    #modeToggleSwitch,
+    #modeToggleSwitchMultiplayer {
+      display: flex;
+      align-items: center;
+      background: var(--cell-bg);
+      border: 1px solid var(--app-border);
+      border-radius: var(--radius-full);
+      padding: 2px;
+      cursor: not-allowed;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      min-width: 64px;
+      height: 24px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    #modeToggleSwitch:hover,
+    #modeToggleSwitchMultiplayer:hover {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transform: translateX(-50%);
+    }
+
+    /* Toggle is now outside the bars */
+
+    /* Hide multiplayer elements by default until JS loads */
+    #multiplayer-score-bar {
+      display: none;
+    }
+
+    #leaderboardBtn {
+      display: none;
+    }
+
+    #modeToggleSwitch:hover,
+    #modeToggleSwitchMultiplayer:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+    }
+
+    .mode-option {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      padding: 3px 5px;
+      z-index: 2;
+      transition: color 0.3s ease;
+      user-select: none;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    .mode-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: calc(50% - 2px);
+      height: calc(100% - 4px);
+      background: linear-gradient(135deg, var(--accent), rgba(37, 99, 235, 0.8));
+      border-radius: var(--radius-full);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
+    }
+
+    #modeToggleSwitch.multiplayer .mode-slider,
+    #modeToggleSwitchMultiplayer.multiplayer .mode-slider {
+      transform: translateX(100%);
+    }
+
+    #modeToggleSwitch.multiplayer .mode-option[data-mode="multiplayer"],
+    #modeToggleSwitchMultiplayer.multiplayer .mode-option[data-mode="multiplayer"] {
+      color: white;
+    }
+
+    #modeToggleSwitch:not(.multiplayer) .mode-option[data-mode="training"],
+    #modeToggleSwitchMultiplayer:not(.multiplayer) .mode-option[data-mode="training"] {
+      color: white;
     }
 
     h1 {
-      margin: 0 0 4px;
-      font-size: 24px;
+      margin: 0 0 8px;
+      margin-top: -8px;
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.02em;
       text-align: center;
+      color: var(--text-primary);
     }
 
     #streak-bar {
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
-      gap: 12px;
+      margin-bottom: 12px;
+      margin-top: 0;
+      gap: 8px;
       font-size: 12px;
       color: var(--text-secondary);
+      min-height: 32px;
+    }
+
+    #streak-bar #modeToggleSwitch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
     }
 
     #bestStreakDisplay {
-      font-weight: 700;
+      font-weight: 600;
       white-space: nowrap;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-primary);
+      background: rgba(251, 191, 36, 0.1);
+      padding: 4px 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      transition: all 0.2s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    #bestStreakDisplay:hover {
       background: rgba(251, 191, 36, 0.15);
-      padding: 6px 14px;
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(217, 119, 6, 0.4);
-      box-shadow: var(--shadow-sm);
-      transition: color 0.3s ease;
+      border-color: rgba(251, 191, 36, 0.3);
     }
 
     #currentStreakDisplay {
       margin-left: auto;
-      font-weight: 700;
-      font-size: 15px;
+      font-weight: 600;
+      font-size: 13px;
       color: var(--text-primary);
-      background: rgba(251, 191, 36, 0.12);
-      padding: 6px 12px;
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(217, 119, 6, 0.35);
-      box-shadow: var(--shadow-sm);
-      transition: color 0.3s ease;
+      background: rgba(37, 99, 235, 0.1);
+      padding: 4px 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      transition: all 0.2s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+
+    #currentStreakDisplay:hover {
+      background: rgba(37, 99, 235, 0.15);
+      border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    #multiplayer-score-bar {
+      position: relative;
+      margin-bottom: 12px;
+      margin-top: 0;
+      min-height: 32px;
+    }
+
+    #multiplayer-score-bar #modeToggleSwitchMultiplayer {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+
+    .player-score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 0;
+      padding-top: 0;
+      min-height: 32px;
+    }
+
+    .player-score-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 1 auto;
+      min-width: 0;
+      justify-content: flex-start;
+      margin-left: 0;
+    }
+
+    .player-score-item-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 1 auto;
+      min-width: 0;
+      justify-content: flex-end;
+      margin-right: 0;
+    }
+
+    .player-name-display {
+      font-weight: 500;
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      min-width: 0;
+      transition: color 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .player-score-value {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--accent);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(37, 99, 235, 0.08));
+      padding: 4px 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+      min-width: 40px;
+      text-align: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .player-score-value:hover {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(37, 99, 235, 0.12));
+      border-color: rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Loading dots animation */
+    .loading-dots {
+      display: inline-block;
+      width: 1.5em;
+      text-align: left;
+      font-family: monospace;
+    }
+
+    .loading-dots::after {
+      content: '...';
+      animation: pulseDots 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulseDots {
+      0%, 100% {
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 1;
+      }
     }
 
     .name-button {
@@ -170,14 +393,13 @@
     #players {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 6px;
+      gap: 8px;
+      margin-bottom: 4px;
       flex-wrap: wrap;
-      align-items: stretch;
+      align-items: center;
     }
 
     .name-bar-info {
-      align-self: stretch;
       min-width: 36px;
       padding: 0 10px;
     }
@@ -186,12 +408,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--player-tag-bg);
-      border-radius: var(--radius-lg);
-      padding: 6px 12px 6px 8px;
-      border: 1px solid var(--player-tag-border);
-      box-shadow: var(--shadow-sm);
-      transition: background 0.3s ease, border-color 0.3s ease;
     }
 
     .player-dot {
@@ -246,6 +462,12 @@
       padding: 6px 12px;
       border-radius: var(--radius-md);
       transition: background 0.3s ease, border-color 0.3s ease;
+      width: calc(9 * 44px + 8 * 4px);
+      margin-left: auto;
+      margin-right: auto;
+      max-width: calc(100% - 16px);
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     #statusRow.status-your-turn {
@@ -408,6 +630,8 @@
       box-shadow: var(--shadow-soft);
       border: 1px solid var(--app-border);
       color: var(--text-primary);
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
     }
 
     #statsContent h2 {
@@ -544,6 +768,8 @@
       box-shadow: var(--shadow-soft);
       border: 1px solid var(--app-border);
       color: var(--text-primary);
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
     }
 
     #trophyContent h2 {
@@ -629,6 +855,8 @@
       box-shadow: var(--shadow-soft);
       border: 1px solid var(--app-border);
       color: var(--text-primary);
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
     }
 
     #shareModalContent h3 {
@@ -636,6 +864,63 @@
       font-size: 16px;
       text-align: center;
       color: var(--text-primary);
+    }
+
+    /* Name Selection Modal (shown when no cached name) */
+    #nameSelectionModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #nameSelectionModal.show {
+      display: flex;
+    }
+
+    #nameSelectionModalContent {
+      background: var(--app-bg);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      max-width: 480px;
+      width: 90%;
+      max-width: min(480px, calc(100vw - 32px));
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--app-border);
+      color: var(--text-primary);
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 0 auto;
+      align-items: center;
+    }
+
+    #nameSelectionModalContent h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    #nameSelectionInput,
+    #nameSelectionPassword {
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    #nameSelectionPasswordSection {
+      width: 100%;
     }
 
     /* Registration/Login Modal */
@@ -662,18 +947,170 @@
       background: var(--app-bg);
       border-radius: var(--radius-xl);
       padding: 24px;
-      max-width: 360px;
+      max-width: 480px;
+      width: 90%;
+      max-width: min(480px, calc(100vw - 32px));
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--app-border);
+      color: var(--text-primary);
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 0 auto;
+      align-items: center;
+    }
+
+    #registerModalContent h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    #registerModalMessage {
+      margin: 0 !important;
+      padding: 0;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    #registerPassword {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-bottom: 0 !important;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    #registerModalContent > div[style*="display: flex"] {
+      display: flex !important;
+      gap: 8px;
+      flex-direction: column;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    #registerModalContent > div[style*="display: flex"] > div[style*="display: flex"] {
+      display: flex !important;
+      gap: 8px;
+      flex-direction: row;
+      width: 100%;
+    }
+
+    #registerModalContent button:not(#registerSkipBtn) {
+      flex: 1;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    #registerSkipBtn {
+      width: 100% !important;
+      background: rgba(34, 197, 94, 0.1) !important;
+      border-color: rgba(34, 197, 94, 0.3) !important;
+      color: rgb(34, 197, 94) !important;
+      font-weight: 600 !important;
+      margin-top: 4px !important;
+      font-size: 12px !important;
+      padding: 8px 16px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    #registerSkipBtn:hover {
+      background: rgba(34, 197, 94, 0.2) !important;
+      border-color: rgba(34, 197, 94, 0.5) !important;
+      color: rgb(22, 163, 74) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    #registerSkipBtn:active {
+      transform: translateY(0) !important;
+    }
+
+    #nameSelectionStartBtn {
+      background: rgba(34, 197, 94, 0.1) !important;
+      border-color: rgba(34, 197, 94, 0.3) !important;
+      color: rgb(34, 197, 94) !important;
+      font-weight: 600 !important;
+    }
+
+    #nameSelectionStartBtn:hover {
+      background: rgba(34, 197, 94, 0.2) !important;
+      border-color: rgba(34, 197, 94, 0.5) !important;
+      color: rgb(22, 163, 74) !important;
+      transform: translateY(-1px);
+    }
+
+    #nameSelectionStartBtn:active {
+      transform: translateY(0);
+    }
+
+    #nameSelectionRegisterBtn {
+      background: var(--accent) !important;
+      color: white !important;
+      border-color: var(--accent) !important;
+      font-weight: 700 !important;
+    }
+
+    #nameSelectionRegisterBtn:hover {
+      background: var(--accent-hover) !important;
+      border-color: var(--accent-hover) !important;
+      color: white !important;
+      transform: translateY(-1px);
+    }
+
+    #nameSelectionRegisterBtn:active {
+      transform: translateY(0);
+    }
+
+    /* Multiplayer Room Modal */
+    #roomModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #roomModal.show {
+      display: flex;
+    }
+
+    #roomModalContent {
+      background: var(--app-bg);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      max-width: 400px;
       width: 90%;
       box-shadow: var(--shadow-soft);
       border: 1px solid var(--app-border);
       color: var(--text-primary);
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
     }
 
-    #registerModalContent h3 {
-      margin: 0 0 12px 0;
+    #roomModalContent h3 {
+      margin: 0 0 16px 0;
       font-size: 18px;
       font-weight: 600;
       text-align: center;
+    }
+
+    #modeToggle.multiplayer {
+      background: rgba(34, 197, 94, 0.9);
+      border-color: rgba(34, 197, 94, 1);
+    }
+
+    #modeToggle.multiplayer:hover {
+      background: rgba(34, 197, 94, 1);
     }
 
     .share-buttons {
@@ -788,12 +1225,14 @@
 
     #board-wrapper {
       background: var(--board-bg);
-      padding: 7px 9px 7px 7px;
+      padding: 4px 2px 4px 2px;
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-soft-inner);
       width: fit-content;
       margin: 0 auto;
       max-width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     #board {
@@ -802,11 +1241,16 @@
       grid-template-rows: repeat(9, 44px);
       gap: 4px;
       width: fit-content;
+      max-width: 100%;
+      box-sizing: border-box;
+      isolation: isolate;
     }
 
     .cell {
       width: 44px;
       height: 44px;
+      min-width: 0;
+      min-height: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -817,12 +1261,14 @@
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
       border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(0, 0, 0, 0.06);
       transition: all 0.2s ease;
       user-select: none;
       position: relative;
       overflow: hidden;
+      box-sizing: border-box;
+      isolation: isolate;
     }
 
     .cell::after {
@@ -838,7 +1284,8 @@
     .cell:hover {
       background: var(--cell-bg-hover);
       transform: scale(1.02);
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+      z-index: 1;
     }
 
     .cell:hover::after {
@@ -970,100 +1417,191 @@
       }
 
       .app {
-        padding: 6px 8px;
+        padding: 6px 6px;
         border-radius: 16px;
         width: 100%;
         max-width: 100%;
+        box-sizing: border-box;
       }
 
       h1 {
         font-size: 18px;
+        margin-bottom: 6px;
       }
 
       #streak-bar {
         font-size: 10px;
         gap: 6px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        margin-bottom: 10px;
+        overflow: hidden;
+      }
+
+      #streak-bar #modeToggleSwitch {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
       }
 
       #bestStreakDisplay {
-        flex: 1;
+        flex: 0 1 auto;
         min-width: 0;
+        max-width: calc(50% - 40px);
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: 11px;
+        padding: 3px 6px;
       }
 
       #currentStreakDisplay {
         margin-left: auto;
         flex-shrink: 0;
+        font-size: 11px;
+        padding: 3px 6px;
+        max-width: calc(50% - 40px);
       }
 
-      #bestStreakDisplay {
-        font-size: 12px;
+      #multiplayer-score-bar {
+        overflow: hidden;
+      }
+
+      .player-score-row {
+        gap: 6px;
+        overflow: hidden;
+      }
+
+      .player-score-item-left,
+      .player-score-item-right {
+        max-width: calc(50% - 40px);
+        min-width: 0;
+      }
+
+      .player-name-display {
+        font-size: 11px;
+        max-width: 80px;
+      }
+
+      .player-score-value {
+        font-size: 16px;
         padding: 3px 8px;
-      }
-
-      #currentStreakDisplay {
-        font-size: 14px;
-        padding: 2px 8px;
+        min-width: 32px;
       }
 
       #board-wrapper {
-        padding: 4px 6px 4px 4px;
+        padding: 3px 2px 3px 2px;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+        box-sizing: border-box;
       }
 
       #board {
-        grid-template-columns: repeat(9, min(36px, calc((100vw - 60px) / 9)));
-        grid-template-rows: repeat(9, min(36px, calc((100vw - 60px) / 9)));
+        grid-template-columns: repeat(9, min(36px, calc((100vw - 48px) / 9)));
+        grid-template-rows: repeat(9, min(36px, calc((100vw - 48px) / 9)));
         gap: 3px;
+        width: fit-content;
+        max-width: 100%;
+        box-sizing: border-box;
+        isolation: isolate;
       }
 
       .cell {
         width: 100%;
         height: 100%;
-        font-size: 20px;
+        aspect-ratio: 1;
+        font-size: clamp(16px, 4vw, 20px);
         border-radius: 6px;
-        min-height: 32px;
-        min-width: 32px;
+        min-height: 0;
+        min-width: 0;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+
+      .cell:hover {
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      #statusRow {
+        width: calc(9 * min(36px, calc((100vw - 48px) / 9)) + 8 * 3px);
+        max-width: calc(100% - 12px);
+        padding: 6px 8px;
+        gap: 8px;
       }
 
       #status {
         font-size: 13px;
-        padding: 8px 4px;
+        padding: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
-      button {
+      button:not(.icon-button):not(.name-button) {
         padding: 8px 14px;
         font-size: 13px;
         min-height: 36px;
+        width: auto;
       }
       
       .icon-button {
         min-width: 36px;
         min-height: 36px;
+        padding: 8px;
       }
 
       .player-name-input {
         min-width: 100px;
+        max-width: 150px;
         font-size: 12px;
         padding: 6px 8px;
         min-height: 32px;
+        box-sizing: border-box;
       }
 
       .name-button {
         font-size: 11px;
         padding: 4px 8px;
         min-height: 32px;
+        flex-shrink: 0;
       }
       
       #players {
         gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      #modeToggleSwitch,
+      #modeToggleSwitchMultiplayer {
+        min-width: 56px;
+        height: 22px;
+        padding: 2px;
+      }
+
+      .mode-option {
+        font-size: 11px;
+        padding: 2px 4px;
+      }
+
+      .mode-slider {
+        top: 2px;
+        left: 2px;
+        width: calc(50% - 2px);
+        height: calc(100% - 4px);
+      }
+
+      .modal-content {
+        max-width: calc(100vw - 32px);
+        margin: 20px auto;
+        padding: 16px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
       }
 
       #statsContent {
-        max-width: 95%;
-        padding: 16px;
+        max-width: 100%;
+        padding: 12px;
       }
 
       #statsColumns {
@@ -1081,7 +1619,7 @@
       }
 
       .achievements-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
         gap: 8px;
       }
 
@@ -1101,62 +1639,269 @@
         font-size: 9px;
       }
 
-      #trophyContent {
-        max-width: 95%;
+      #trophyContent,
+      #shareModalContent,
+      #registerModalContent,
+      #roomModalContent,
+      #nameSelectionModalContent {
+        max-width: calc(100vw - 20px);
+        width: calc(100vw - 20px);
         padding: 16px;
+        max-height: calc(100vh - 20px);
+      }
+
+      #registerModalContent {
+        padding: 16px;
+        gap: 10px;
+        max-width: min(480px, calc(100vw - 20px));
+        width: calc(100vw - 20px);
+      }
+
+      #nameSelectionModalContent {
+        padding: 20px;
+        gap: 12px;
+      }
+
+      #nameSelectionModalContent h3 {
+        font-size: 18px;
+      }
+
+      #nameSelectionInput,
+      #nameSelectionPassword {
+        font-size: 14px;
+        padding: 10px;
+        min-height: 44px;
+      }
+
+      #nameSelectionStartBtn,
+      #nameSelectionRegisterBtn,
+      #nameSelectionLoginBtn {
+        min-height: 44px;
+        font-size: 15px;
+      }
+
+      #nameSelectionMessage {
+        font-size: 13px !important;
+      }
+
+      #nameSelectionWarning {
+        font-size: 12px !important;
+      }
+
+      #registerModalContent h3 {
+        font-size: 16px;
+      }
+
+      #registerModalMessage {
+        font-size: 12px !important;
+      }
+
+      #registerPassword {
+        font-size: 14px;
+        padding: 8px 10px;
+        min-height: 40px;
+        text-align: center;
+      }
+
+      #registerModalContent button:not(#registerSkipBtn) {
+        min-height: 40px;
+        font-size: 14px;
+      }
+
+      #registerSkipBtn {
+        min-height: 40px;
+        font-size: 13px !important;
+        padding: 8px 12px !important;
+      }
+
+      #statsContent {
+        padding: 12px;
       }
     }
 
     @media (max-width: 400px) {
-      #board {
-        grid-template-columns: repeat(9, min(30px, calc((100vw - 50px) / 9)));
-        grid-template-rows: repeat(9, min(30px, calc((100vw - 50px) / 9)));
-        gap: 2px;
-      }
-      
-      .cell {
-        font-size: 18px;
-        min-height: 28px;
-        min-width: 28px;
+      body {
+        padding: 6px;
       }
 
-      .cell {
-        font-size: 16px;
+      .app {
+        padding: 4px 4px;
       }
 
       h1 {
         font-size: 16px;
+        margin-bottom: 4px;
       }
 
       #streak-bar {
         font-size: 9px;
+        gap: 4px;
+        margin-bottom: 8px;
       }
 
       #bestStreakDisplay {
-        font-size: 11px;
-        padding: 2px 6px;
+        font-size: 10px;
+        padding: 2px 5px;
+        max-width: calc(50% - 35px);
       }
 
       #currentStreakDisplay {
-        font-size: 12px;
+        font-size: 10px;
+        padding: 2px 5px;
+        max-width: calc(50% - 35px);
+      }
+
+      .player-name-display {
+        font-size: 10px;
+        max-width: 70px;
+      }
+
+      .player-score-value {
+        font-size: 14px;
         padding: 2px 6px;
+        min-width: 28px;
+      }
+
+      #board-wrapper {
+        padding: 2px 1px 2px 1px;
+      }
+
+      #board {
+        grid-template-columns: repeat(9, min(30px, calc((100vw - 40px) / 9)));
+        grid-template-rows: repeat(9, min(30px, calc((100vw - 40px) / 9)));
+        gap: 2px;
+        isolation: isolate;
+      }
+      
+      .cell {
+        font-size: clamp(14px, 3.5vw, 16px);
+        min-height: 0;
+        min-width: 0;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+      }
+
+      .cell:hover {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      }
+
+      #statusRow {
+        width: calc(9 * min(30px, calc((100vw - 40px) / 9)) + 8 * 2px);
+        max-width: calc(100% - 8px);
+        padding: 5px 6px;
+        gap: 6px;
+        min-height: 32px;
+      }
+
+      #status {
+        font-size: 12px;
+      }
+
+      button:not(.icon-button):not(.name-button) {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-height: 32px;
+      }
+
+      .icon-button {
+        min-width: 32px;
+        min-height: 32px;
+        padding: 6px;
+      }
+
+      .player-name-input {
+        min-width: 90px;
+        max-width: 120px;
+        font-size: 11px;
+        padding: 5px 6px;
+        min-height: 30px;
+      }
+
+      .name-button {
+        font-size: 10px;
+        padding: 4px 6px;
+        min-height: 30px;
+      }
+
+      #modeToggleSwitch,
+      #modeToggleSwitchMultiplayer {
+        min-width: 52px;
+        height: 20px;
+        padding: 1px;
+      }
+
+      .mode-option {
+        font-size: 10px;
+        padding: 2px 3px;
+      }
+
+      .mode-slider {
+        top: 1px;
+        left: 1px;
+        width: calc(50% - 1px);
+        height: calc(100% - 2px);
       }
     }
 
     @media (min-width: 601px) and (max-width: 900px) {
+      .app {
+        max-width: 480px;
+      }
+
+      #board-wrapper {
+        padding: 5px 3px 5px 3px;
+      }
+
       #board {
         grid-template-columns: repeat(9, min(38px, calc((100vw - 120px) / 9)));
         grid-template-rows: repeat(9, min(38px, calc((100vw - 120px) / 9)));
+        gap: 3px;
+        isolation: isolate;
       }
 
       .cell {
-        font-size: 22px;
+        font-size: clamp(20px, 2.5vw, 22px);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+      }
+
+      .cell:hover {
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.11);
+      }
+
+      #statusRow {
+        width: calc(9 * min(38px, calc((100vw - 120px) / 9)) + 8 * 3px);
+        max-width: calc(100% - 16px);
+      }
+    }
+
+    @media (min-width: 901px) and (max-width: 1199px) {
+      .app {
+        max-width: 520px;
       }
     }
 
     @media (min-width: 1200px) {
       .app {
-        max-width: 600px;
+        max-width: 500px;
+      }
+    }
+
+    /* Prevent text overflow and ensure proper scaling */
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Ensure modals are responsive */
+    @media (max-width: 600px) {
+      .modal {
+        padding: 10px;
+      }
+
+      .modal-content {
+        width: calc(100vw - 20px);
+        max-width: calc(100vw - 20px);
+        margin: 10px auto;
+        padding: 12px;
       }
     }
   </style>
@@ -1169,7 +1914,25 @@
   <div class="app">
     <div id="streak-bar">
       <div id="bestStreakDisplay">Best streak: none</div>
+      <div id="modeToggleSwitch" class="mode-toggle"></div>
       <div id="currentStreakDisplay">Streak: 0</div>
+    </div>
+    
+    <!-- Multiplayer Score Display -->
+    <div id="multiplayer-score-bar" style="display: none;">
+      <div class="player-score-row">
+        <div class="player-score-item-left">
+          <div id="player1ScoreDisplay" class="player-score-value">0</div>
+          <div id="player1NameDisplay" class="player-name-display">-</div>
+        </div>
+        <div id="modeToggleSwitchMultiplayer" class="mode-toggle"></div>
+        <div class="player-score-item-right">
+          <div id="player2NameDisplay" class="player-name-display">
+            Waiting <span class="loading-dots"></span>
+          </div>
+          <div id="player2ScoreDisplay" class="player-score-value">0</div>
+        </div>
+      </div>
     </div>
 
     <h1>5-in-a-Row</h1>
@@ -1186,6 +1949,79 @@
         <button id="applyHumanName" class="name-button" type="button">Set</button>
       </div>
       <button id="shareGameResultBtn" class="icon-button name-bar-info" aria-label="Share result" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.82 3.98"/><path d="m15.41 6.51-6.82 3.98"/></svg></button>
+    </div>
+
+    <!-- Multiplayer Room Modal -->
+    <div id="roomModal">
+      <div id="roomModalContent">
+        <h3 id="roomModalTitle">Multiplayer</h3>
+        <div id="roomModalBody">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button id="createRoomBtn" class="button" style="width: 100%;">Create Room</button>
+            <button id="joinRoomBtn" class="button" style="width: 100%;">Join Room</button>
+            <button id="quickMatchBtn" class="button" style="width: 100%;">Quick Match</button>
+          </div>
+          <div id="roomIdSection" style="display: none; margin-top: 16px;">
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Room ID:</div>
+            <div id="roomIdDisplay" style="font-size: 18px; font-weight: 700; font-family: monospace; background: var(--cell-bg); padding: 8px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--input-border);"></div>
+            <button id="copyRoomIdBtn" class="icon-button" style="width: 100%; margin-top: 8px;">📋 Copy Room ID</button>
+          </div>
+          <div id="waitingRoomSection" style="display: none; margin-top: 16px; text-align: center;">
+            <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">Waiting for opponent...</div>
+            <div id="roomPlayers" style="display: flex; justify-content: space-around; gap: 16px;">
+              <div>
+                <div style="font-size: 12px; color: var(--text-secondary);">Player 1</div>
+                <div id="roomPlayer1" style="font-weight: 600;">-</div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: var(--text-secondary);">Player 2</div>
+                <div id="roomPlayer2" style="font-weight: 600;">-</div>
+              </div>
+            </div>
+          </div>
+          <div id="joinRoomSection" style="display: none; margin-top: 16px;">
+            <input id="joinRoomIdInput" type="text" class="player-name-input" placeholder="Enter Room ID" style="width: 100%; margin-bottom: 10px;" />
+            <button id="joinRoomConfirmBtn" class="button" style="width: 100%;">Join</button>
+          </div>
+        </div>
+        <button id="roomModalClose" class="icon-button" style="margin-top: 12px; width: 100%;">Close</button>
+      </div>
+    </div>
+
+    <!-- Name Selection Modal (shown when no cached name) -->
+    <div id="nameSelectionModal">
+      <div id="nameSelectionModalContent">
+        <h3>Welcome to 5-in-a-Row!</h3>
+        <div id="nameSelectionMessage" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; text-align: center;">
+          Enter your name to start playing (minimum 3 characters)
+        </div>
+        <input
+          id="nameSelectionInput"
+          type="text"
+          class="player-name-input"
+          placeholder="Your name"
+          style="width: 100%; margin-bottom: 12px; text-align: center; font-size: 16px; padding: 10px;"
+          autofocus
+          minlength="3"
+        />
+        <div id="nameSelectionWarning" style="display: none; font-size: 13px; color: #dc2626; margin-bottom: 12px; text-align: center; font-weight: 500;">
+          If you register your username, no one can claim your streaks!
+        </div>
+        <div id="nameSelectionPasswordSection" style="display: none; width: 100%; margin-bottom: 12px;">
+          <input
+            id="nameSelectionPassword"
+            type="password"
+            class="player-name-input"
+            placeholder="Enter password"
+            style="width: 100%; text-align: center; font-size: 16px; padding: 10px;"
+          />
+        </div>
+        <div id="nameSelectionButtons" style="display: flex; gap: 8px; flex-direction: column;">
+          <button id="nameSelectionStartBtn" class="button" style="width: 100%; display: none;">Play Now</button>
+          <button id="nameSelectionRegisterBtn" class="button" style="width: 100%; display: none;">Register Name</button>
+          <button id="nameSelectionLoginBtn" class="button" style="width: 100%; display: none;">Login</button>
+        </div>
+      </div>
     </div>
 
     <!-- Registration/Login Modal -->
@@ -1217,6 +2053,7 @@
     <div id="controls">
       <button id="restartBtn" title="Restart game (R or Space)">Restart game</button>
       <button id="statsBtn" class="icon-button" aria-label="Statistics">📈</button>
+      <button id="leaderboardBtn" class="icon-button" aria-label="Leaderboard" style="display: none;">🏆</button>
       <button id="trophyBtn" class="icon-button" aria-label="Achievements">🏆</button>
       <button id="soundToggle" class="icon-button" aria-label="Toggle sound">🎵</button>
       <button id="themeToggle" class="icon-button" aria-label="Toggle theme">🌙</button>
@@ -1382,6 +2219,19 @@
     const currentStreakElem = document.getElementById("currentStreakDisplay");
     const bestStreakElem = document.getElementById("bestStreakDisplay");
     const applyHumanNameBtn = document.getElementById("applyHumanName");
+    const nameSelectionModal = document.getElementById("nameSelectionModal");
+    const nameSelectionInput = document.getElementById("nameSelectionInput");
+    const nameSelectionPassword = document.getElementById("nameSelectionPassword");
+    const nameSelectionMessage = document.getElementById("nameSelectionMessage");
+    const nameSelectionWarning = document.getElementById("nameSelectionWarning");
+    const nameSelectionPasswordSection = document.getElementById("nameSelectionPasswordSection");
+    const nameSelectionButtons = document.getElementById("nameSelectionButtons");
+    const nameSelectionStartBtn = document.getElementById("nameSelectionStartBtn");
+    const nameSelectionRegisterBtn = document.getElementById("nameSelectionRegisterBtn");
+    const nameSelectionLoginBtn = document.getElementById("nameSelectionLoginBtn");
+    
+    let nameCheckTimeout = null;
+    
     const registerModal = document.getElementById("registerModal");
     const registerModalContent = document.getElementById("registerModalContent");
     const registerModalTitle = document.getElementById("registerModalTitle");
@@ -1390,6 +2240,27 @@
     const registerConfirmBtn = document.getElementById("registerConfirmBtn");
     const registerCancelBtn = document.getElementById("registerCancelBtn");
     const registerSkipBtn = document.getElementById("registerSkipBtn");
+    const roomModal = document.getElementById("roomModal");
+    const roomModalContent = document.getElementById("roomModalContent");
+    const roomModalTitle = document.getElementById("roomModalTitle");
+    const roomModalBody = document.getElementById("roomModalBody");
+    const createRoomBtn = document.getElementById("createRoomBtn");
+    const joinRoomBtn = document.getElementById("joinRoomBtn");
+    const quickMatchBtn = document.getElementById("quickMatchBtn");
+    const roomIdSection = document.getElementById("roomIdSection");
+    const roomIdDisplay = document.getElementById("roomIdDisplay");
+    const copyRoomIdBtn = document.getElementById("copyRoomIdBtn");
+    const waitingRoomSection = document.getElementById("waitingRoomSection");
+    const roomPlayer1 = document.getElementById("roomPlayer1");
+    const roomPlayer2 = document.getElementById("roomPlayer2");
+    const joinRoomSection = document.getElementById("joinRoomSection");
+    const joinRoomIdInput = document.getElementById("joinRoomIdInput");
+    const joinRoomConfirmBtn = document.getElementById("joinRoomConfirmBtn");
+    const roomModalClose = document.getElementById("roomModalClose");
+    const leaderboardBtn = document.getElementById("leaderboardBtn");
+    const modeToggleSwitch = document.getElementById("modeToggleSwitch");
+    const modeToggleSwitchMultiplayer = document.getElementById("modeToggleSwitchMultiplayer");
+    const multiplayerScoreBar = document.getElementById("multiplayer-score-bar");
 
     let pendingName = "";
     let isLoginMode = false;
@@ -1460,8 +2331,94 @@
         : `Register "${name}" with a password to protect it.`;
       registerPassword.value = "";
       registerPassword.focus();
-      registerSkipBtn.style.display = isLogin ? "none" : "block";
+      registerSkipBtn.style.display = "none";
       registerModal.classList.add("show");
+    }
+
+    function showNameSelectionModal() {
+      nameSelectionModal.classList.add("show");
+      nameSelectionInput.value = "";
+      nameSelectionPassword.value = "";
+      nameSelectionPasswordSection.style.display = "none";
+      nameSelectionWarning.style.display = "none";
+      nameSelectionMessage.textContent = "Enter your name to start playing (minimum 3 characters)";
+      nameSelectionMessage.style.color = "var(--text-secondary)";
+      nameSelectionStartBtn.style.display = "none";
+      nameSelectionRegisterBtn.style.display = "none";
+      nameSelectionLoginBtn.style.display = "none";
+      setTimeout(() => {
+        nameSelectionInput.focus();
+      }, 100);
+    }
+
+    function hideNameSelectionModal() {
+      nameSelectionModal.classList.remove("show");
+      nameSelectionInput.value = "";
+      nameSelectionPassword.value = "";
+      nameSelectionPasswordSection.style.display = "none";
+      nameSelectionWarning.style.display = "none";
+      if (nameCheckTimeout) {
+        clearTimeout(nameCheckTimeout);
+        nameCheckTimeout = null;
+      }
+    }
+
+    async function checkNameAndUpdateModal() {
+      const name = nameSelectionInput.value.trim();
+      
+      // Validate minimum length
+      if (name.length < 3) {
+        nameSelectionPasswordSection.style.display = "none";
+        nameSelectionWarning.style.display = "none";
+        nameSelectionStartBtn.style.display = "none";
+        nameSelectionRegisterBtn.style.display = "none";
+        nameSelectionLoginBtn.style.display = "none";
+        if (name.length > 0) {
+          nameSelectionMessage.textContent = "Name must be at least 3 characters long";
+          nameSelectionMessage.style.color = "#dc2626";
+        } else {
+          nameSelectionMessage.textContent = "Enter your name to start playing (minimum 3 characters)";
+          nameSelectionMessage.style.color = "var(--text-secondary)";
+        }
+        return;
+      }
+      
+      nameSelectionMessage.style.color = "var(--text-secondary)";
+      
+      // Check if name is registered
+      if (firebaseInitialized && db) {
+        const isRegistered = await checkNameRegistered(name);
+        if (isRegistered) {
+          // Name is registered - show password field and login button (NO warning)
+          nameSelectionPasswordSection.style.display = "block";
+          nameSelectionWarning.style.display = "none";
+          nameSelectionStartBtn.style.display = "none";
+          nameSelectionRegisterBtn.style.display = "none";
+          nameSelectionLoginBtn.style.display = "block";
+          nameSelectionMessage.textContent = `"${name}" is already registered. Enter password to login, or choose a different name.`;
+          setTimeout(() => {
+            nameSelectionPassword.focus();
+          }, 100);
+        } else {
+          // Name is not registered - show play and register options WITH warning
+          nameSelectionPasswordSection.style.display = "none";
+          nameSelectionWarning.style.display = "block";
+          nameSelectionStartBtn.style.display = "block";
+          nameSelectionRegisterBtn.style.display = "block";
+          nameSelectionLoginBtn.style.display = "none";
+          nameSelectionStartBtn.textContent = "Play without registering";
+          nameSelectionMessage.textContent = `"${name}" is available. Choose to play now or register it.`;
+        }
+      } else {
+        // Firebase not configured - just show play button (NO warning)
+        nameSelectionPasswordSection.style.display = "none";
+        nameSelectionWarning.style.display = "none";
+        nameSelectionStartBtn.style.display = "block";
+        nameSelectionRegisterBtn.style.display = "none";
+        nameSelectionLoginBtn.style.display = "none";
+        nameSelectionStartBtn.textContent = "Play without registering";
+        nameSelectionMessage.textContent = "Enter your name to start playing (minimum 3 characters)";
+      }
     }
 
     function hideRegisterModal() {
@@ -1494,6 +2451,18 @@
     let bestStreakName = "";
     let soundEnabled = true;
     let currentPlayerName = "";
+    let gameMode = "training"; // "training" or "multiplayer"
+    let currentRoomId = null;
+    let roomListener = null;
+    let isPlayer1 = false;
+    let matchGameNumber = 0; // 0 = first game, 1 = second game
+    let matchResults = { player1Wins: 0, draws: 0, player2Wins: 0 };
+    let opponentName = "";
+    let myMarkInMatch = "X"; // X in first game, O in second game
+    let player1Name = "";
+    let player2Name = "";
+    let currentMatchScore = { player1: 0, player2: 0 };
+    let loadingDotsInterval = null;
     
     // Statistics
     let currentPlayerStats = {
@@ -1599,6 +2568,7 @@
       const r = parseInt(cell.dataset.row, 10);
       const c = parseInt(cell.dataset.col, 10);
       if (!board || board[r][c] !== "" || currentPlayer !== humanPlayer || gameOver || computerThinking || !hasHumanName()) return;
+      if (gameMode === "multiplayer" && currentPlayer !== humanPlayer) return;
       const cls = humanPlayer === "X" ? "preview-X" : "preview-O";
       cell.classList.add(cls);
       cell.dataset.preview = humanPlayer;
@@ -1625,6 +2595,16 @@
 
     async function handleMove(r, c, isComputer) {
       if (gameOver) return;
+      
+      // In multiplayer mode, only allow moves for current player
+      if (gameMode === "multiplayer" && !isComputer) {
+        if (currentPlayer !== humanPlayer) {
+          return; // Not your turn
+        }
+        if (!currentRoomId) {
+          return; // Not in a room
+        }
+      }
 
       // Track if this is a blocking move (check before placing)
       if (isComputer && currentPlayer === computerPlayer) {
@@ -1696,68 +2676,89 @@
       const winLine = getWinningLine(board, r, c, currentPlayer);
       if (winLine) {
         gameOver = true;
-        currentPlayerStats.gamesPlayed++;
-        globalStats.gamesPlayed++;
-        
         highlightWinningLine(winLine);
-        if (isComputer) {
-          setStatusWithMark(getComputerDisplayName(), currentPlayer, " wins!");
-          statusRow.className = "status-neutral";
-          lastGameResultText = `I just lost in 5-in-a-Row. My streak was ${currentStreak}. Can you do better?`;
-          currentStreak = 0;
-          currentPlayerStats.losses++;
-          globalStats.losses++;
-          playSound("aw");
+        
+        if (gameMode === "multiplayer") {
+          // Multiplayer win handling
+          const winner = currentPlayer;
+          await handleMultiplayerGameEnd(winner, null);
         } else {
-          const winnerName = getHumanDisplayName();
-          setStatusWithMark(winnerName, currentPlayer, " wins!");
-          statusRow.className = "status-neutral";
-          currentStreak += 1;
-          currentPlayerStats.wins++;
-          globalStats.wins++;
-          if (currentStreak > bestStreak) {
-            bestStreak = currentStreak;
-            bestStreakName = winnerName;
-            saveBestStreak();
+          // Training mode win handling
+          currentPlayerStats.gamesPlayed++;
+          globalStats.gamesPlayed++;
+          
+          if (isComputer) {
+            setStatusWithMark(getComputerDisplayName(), currentPlayer, " wins!");
+            statusRow.className = "status-neutral";
+            lastGameResultText = `I just lost in 5-in-a-Row. My streak was ${currentStreak}. Can you do better?`;
+            currentStreak = 0;
+            currentPlayerStats.losses++;
+            globalStats.losses++;
+            playSound("aw");
+          } else {
+            const winnerName = getHumanDisplayName();
+            setStatusWithMark(winnerName, currentPlayer, " wins!");
+            statusRow.className = "status-neutral";
+            currentStreak += 1;
+            currentPlayerStats.wins++;
+            globalStats.wins++;
+            if (currentStreak > bestStreak) {
+              bestStreak = currentStreak;
+              bestStreakName = winnerName;
+              saveBestStreak();
+            }
+            playSound("applause");
+            createConfetti();
+            lastGameResultText = `I just won in 5-in-a-Row! Streak: ${currentStreak}. Try to beat me!`;
+            checkWinAchievements();
           }
-          playSound("applause");
-          createConfetti();
-          lastGameResultText = `I just won in 5-in-a-Row! Streak: ${currentStreak}. Try to beat me!`;
-          // Check win-specific achievements
-          checkWinAchievements();
+          checkAchievements();
+          saveStats();
+          if (gameMode === "training") {
+            updateStreakDisplays();
+          }
+          shareGameResultBtn.classList.add("visible");
+          computerThinking = false;
+          resetGameState();
         }
-        // Check all achievements
-        checkAchievements();
-        saveStats();
-        updateStreakDisplays();
-        shareGameResultBtn.classList.add("visible");
-        computerThinking = false;
-        resetGameState();
         return;
       }
 
       if (boardFull(board)) {
         gameOver = true;
-        currentPlayerStats.gamesPlayed++;
-        currentPlayerStats.draws++;
-        globalStats.gamesPlayed++;
-        globalStats.draws++;
-        statusElem.textContent = "It's a draw!";
-        statusRow.className = "status-neutral";
-        playSound("draw");
-        lastGameResultText = `I just played a draw in 5-in-a-Row. Streak: ${currentStreak}. Give it a try!`;
-        checkAchievements();
-        saveStats();
-        shareGameResultBtn.classList.add("visible");
-        computerThinking = false;
-        resetGameState();
+        
+        if (gameMode === "multiplayer") {
+          // Multiplayer draw handling
+          await handleMultiplayerGameEnd(null, "draw");
+        } else {
+          // Training mode draw handling
+          currentPlayerStats.gamesPlayed++;
+          currentPlayerStats.draws++;
+          globalStats.gamesPlayed++;
+          globalStats.draws++;
+          statusElem.textContent = "It's a draw!";
+          statusRow.className = "status-neutral";
+          playSound("draw");
+          lastGameResultText = `I just played a draw in 5-in-a-Row. Streak: ${currentStreak}. Give it a try!`;
+          checkAchievements();
+          saveStats();
+          shareGameResultBtn.classList.add("visible");
+          computerThinking = false;
+          resetGameState();
+        }
         return;
       }
 
       // Switch turns
       currentPlayer = currentPlayer === "X" ? "O" : "X";
 
-      // Decide whose turn it is next and update status with names
+      // In multiplayer mode, sync to Firestore
+      if (gameMode === "multiplayer" && currentRoomId && firebaseInitialized && db) {
+        await syncMoveToFirestore(r, c);
+        return; // Don't continue with computer move logic
+      }
+
+      // Decide whose turn it is next and update status with names (training mode)
       if (currentPlayer === humanPlayer) {
         const name = getHumanDisplayName();
         setStatusWithMark(name, currentPlayer, " – your turn");
@@ -1772,6 +2773,24 @@
           clearTimeout(computerMoveTimeoutId);
         }
         computerMoveTimeoutId = setTimeout(computerMove, 1000);
+      }
+    }
+
+    async function syncMoveToFirestore(r, c) {
+      if (!currentRoomId || !firebaseInitialized || !db) return;
+
+      try {
+        const roomRef = db.collection("gameRooms").doc(currentRoomId);
+        const winner = gameOver ? (currentPlayer === humanPlayer ? humanPlayer : computerPlayer) : null;
+        await roomRef.update({
+          board: board,
+          currentPlayer: currentPlayer,
+          gameOver: gameOver,
+          winner: winner,
+          lastMove: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (error) {
+        console.error("Error syncing move:", error);
       }
     }
 
@@ -2675,7 +3694,42 @@
     }
 
     function restartGame() {
+      if (gameMode === "multiplayer" && currentRoomId) {
+        alert("Cannot restart in multiplayer mode. Please leave the room first.");
+        return;
+      }
       startNewRound();
+    }
+
+    function setStatusForTurn() {
+      if (!hasHumanName()) {
+        statusElem.textContent = "Enter your name above to start playing";
+        statusRow.className = "status-neutral";
+        return;
+      }
+
+      if (gameMode === "multiplayer" && currentRoomId) {
+        if (currentPlayer === humanPlayer) {
+          const name = getHumanDisplayName();
+          setStatusWithMark(name, currentPlayer, " – your turn");
+          statusRow.className = "status-your-turn";
+        } else {
+          setStatusWithMark(opponentName || "Opponent", currentPlayer, " is thinking...");
+          statusRow.className = "status-computer-turn";
+        }
+      } else {
+        // Training mode
+        if (currentPlayer === humanPlayer) {
+          const name = getHumanDisplayName();
+          setStatusWithMark(name, currentPlayer, " – your turn");
+          statusRow.className = "status-your-turn";
+          computerThinking = false;
+        } else {
+          setStatusWithMark(getComputerDisplayName(), currentPlayer, " is thinking...");
+          statusRow.className = "status-computer-turn";
+          computerThinking = true;
+        }
+      }
     }
 
     // ---- Theme management ----
@@ -2700,6 +3754,770 @@
     setTheme(getTheme());
     themeToggleBtn.addEventListener("click", toggleTheme);
 
+    // ---- Multiplayer Mode ----
+
+    function generateRoomId() {
+      return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+
+    function loadGameMode() {
+      try {
+        const saved = localStorage.getItem("tictac9x9_gameMode");
+        if (saved === "multiplayer" || saved === "training") {
+          gameMode = saved;
+        }
+      } catch (e) {
+        // ignore errors
+        gameMode = "training"; // Default to training on error
+      }
+    }
+
+    function saveGameMode() {
+      try {
+        localStorage.setItem("tictac9x9_gameMode", gameMode);
+      } catch (e) {
+        // ignore errors
+      }
+    }
+
+    function updateModeToggle() {
+      // Ensure elements exist before trying to update them
+      const toggleSwitch = document.getElementById("modeToggleSwitch");
+      const toggleSwitchMultiplayer = document.getElementById("modeToggleSwitchMultiplayer");
+      
+      if (!toggleSwitch || !toggleSwitchMultiplayer) {
+        console.warn("Mode toggle elements not found");
+        return;
+      }
+      
+      if (gameMode === "multiplayer") {
+        toggleSwitch.classList.add("multiplayer");
+        toggleSwitchMultiplayer.classList.add("multiplayer");
+        toggleSwitch.title = "Multiplayer Mode - Click to switch to Training";
+        toggleSwitchMultiplayer.title = "Multiplayer Mode - Click to switch to Training";
+        // Hide streak displays, show multiplayer scores
+        const streakBar = document.getElementById("streak-bar");
+        const statsBtn = document.getElementById("statsBtn");
+        const leaderboardBtn = document.getElementById("leaderboardBtn");
+        const trophyBtn = document.getElementById("trophyBtn");
+        
+        if (streakBar) streakBar.style.display = "none";
+        if (multiplayerScoreBar) multiplayerScoreBar.style.display = "block";
+        if (statsBtn) statsBtn.style.display = "none";
+        if (leaderboardBtn) leaderboardBtn.style.display = "block";
+        if (trophyBtn) trophyBtn.style.display = "none";
+      } else {
+        toggleSwitch.classList.remove("multiplayer");
+        toggleSwitchMultiplayer.classList.remove("multiplayer");
+        toggleSwitch.title = "Training Mode - Click to switch to Multiplayer";
+        toggleSwitchMultiplayer.title = "Training Mode - Click to switch to Multiplayer";
+        // Show streak displays, hide multiplayer scores
+        const streakBar = document.getElementById("streak-bar");
+        const statsBtn = document.getElementById("statsBtn");
+        const leaderboardBtn = document.getElementById("leaderboardBtn");
+        const trophyBtn = document.getElementById("trophyBtn");
+        
+        if (streakBar) streakBar.style.display = "flex";
+        if (multiplayerScoreBar) multiplayerScoreBar.style.display = "none";
+        if (statsBtn) statsBtn.style.display = "block";
+        if (leaderboardBtn) leaderboardBtn.style.display = "none";
+        if (trophyBtn) trophyBtn.style.display = "block";
+        // Reset multiplayer score display
+        updateMultiplayerScoreDisplay();
+      }
+    }
+
+    function updateMultiplayerScoreDisplay() {
+      if (gameMode !== "multiplayer") return;
+      
+      const player1NameDisplay = document.getElementById("player1NameDisplay");
+      const player2NameDisplay = document.getElementById("player2NameDisplay");
+      const player1ScoreDisplay = document.getElementById("player1ScoreDisplay");
+      const player2ScoreDisplay = document.getElementById("player2ScoreDisplay");
+      
+      if (!player1NameDisplay || !player2NameDisplay || !player1ScoreDisplay || !player2ScoreDisplay) return;
+      
+      // Update player names
+      if (player1Name) {
+        player1NameDisplay.textContent = player1Name;
+      } else {
+        player1NameDisplay.textContent = "-";
+      }
+      
+      if (player2Name) {
+        player2NameDisplay.textContent = player2Name;
+        // Stop loading animation
+        if (loadingDotsInterval) {
+          clearInterval(loadingDotsInterval);
+          loadingDotsInterval = null;
+        }
+      } else {
+        // Show "Waiting" + loading dots animation
+        if (!player2NameDisplay.querySelector(".loading-dots")) {
+          player2NameDisplay.innerHTML = 'Waiting <span class="loading-dots"></span>';
+        } else {
+          // Update text but keep dots
+          const loadingSpan = player2NameDisplay.querySelector(".loading-dots");
+          if (loadingSpan && !player2NameDisplay.textContent.includes("Waiting")) {
+            player2NameDisplay.innerHTML = 'Waiting <span class="loading-dots"></span>';
+          }
+        }
+        // Animate dots
+        const loadingSpan = player2NameDisplay.querySelector(".loading-dots");
+        if (loadingSpan && !loadingDotsInterval) {
+          let dotCount = 0;
+          loadingDotsInterval = setInterval(() => {
+            dotCount = (dotCount % 3) + 1;
+            loadingSpan.textContent = '.'.repeat(dotCount);
+          }, 500);
+        }
+      }
+      
+      // Update scores
+      if (currentRoomId && player1Name) {
+        const scores = calculateMatchScore(matchResults.player1Wins, matchResults.draws, matchResults.player2Wins);
+        currentMatchScore = { player1: scores.player1Score, player2: scores.player2Score };
+        player1ScoreDisplay.textContent = scores.player1Score;
+        player2ScoreDisplay.textContent = scores.player2Score;
+      } else {
+        player1ScoreDisplay.textContent = "0";
+        player2ScoreDisplay.textContent = "0";
+      }
+    }
+
+    function toggleGameMode() {
+      if (gameMode === "training") {
+        // Switching to multiplayer - need name first
+        if (!hasHumanName()) {
+          alert("Please enter your name before switching to multiplayer mode.");
+          return;
+        }
+        gameMode = "multiplayer";
+        saveGameMode();
+        updateModeToggle();
+        showRoomModal();
+      } else {
+        // Switching to training - leave room if in one
+        if (currentRoomId) {
+          leaveRoom();
+        }
+        gameMode = "training";
+        saveGameMode();
+        updateModeToggle();
+        restartGame();
+      }
+    }
+
+    function showRoomModal() {
+      roomModalBody.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button id="createRoomBtn" class="button" style="width: 100%;">Create Room</button>
+          <button id="joinRoomBtn" class="button" style="width: 100%;">Join Room</button>
+          <button id="quickMatchBtn" class="button" style="width: 100%;">Quick Match</button>
+        </div>
+      `;
+      roomIdSection.style.display = "none";
+      waitingRoomSection.style.display = "none";
+      joinRoomSection.style.display = "none";
+      roomModal.classList.add("show");
+      
+      // Re-attach event listeners
+      document.getElementById("createRoomBtn").addEventListener("click", createRoom);
+      document.getElementById("joinRoomBtn").addEventListener("click", () => {
+        roomModalBody.innerHTML = "";
+        joinRoomSection.style.display = "block";
+        joinRoomIdInput.focus();
+      });
+      document.getElementById("quickMatchBtn").addEventListener("click", quickMatch);
+    }
+
+    function hideRoomModal() {
+      roomModal.classList.remove("show");
+    }
+
+    async function createRoom() {
+      if (!firebaseInitialized || !db) {
+        alert("Multiplayer requires Firebase. Please configure Firebase.");
+        return;
+      }
+      if (!hasHumanName()) {
+        alert("Please enter your name first.");
+        return;
+      }
+
+      const roomId = generateRoomId();
+      currentRoomId = roomId;
+      isPlayer1 = true;
+      matchGameNumber = 0;
+      matchResults = { player1Wins: 0, draws: 0, player2Wins: 0 };
+
+      try {
+        const playerName = currentPlayerName || humanNameInput.value.trim();
+        await db.collection("gameRooms").doc(roomId).set({
+          roomId: roomId,
+          player1: {
+            name: playerName,
+            mark: "X",
+            ready: true
+          },
+          player2: null,
+          board: createEmptyBoard(),
+          currentPlayer: "X",
+          gameOver: false,
+          winner: null,
+          matchGameNumber: 0,
+          matchResults: { player1Wins: 0, draws: 0, player2Wins: 0 },
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastMove: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        player1Name = playerName;
+        player2Name = ""; // Reset until player2 joins
+        
+        // Update display immediately - check if we're in multiplayer mode
+        if (gameMode === "multiplayer") {
+          const player1NameDisplay = document.getElementById("player1NameDisplay");
+          if (player1NameDisplay) {
+            player1NameDisplay.textContent = playerName;
+          }
+          updateMultiplayerScoreDisplay();
+        }
+        roomIdDisplay.textContent = roomId;
+        roomIdSection.style.display = "block";
+        waitingRoomSection.style.display = "block";
+        roomPlayer1.textContent = playerName;
+        roomPlayer2.textContent = "Waiting...";
+        roomModalBody.innerHTML = "";
+
+        // Listen for room updates
+        setupRoomListener(roomId);
+      } catch (error) {
+        console.error("Error creating room:", error);
+        alert("Failed to create room. Please try again.");
+      }
+    }
+
+    async function joinRoom(roomIdToJoin) {
+      if (!firebaseInitialized || !db) {
+        alert("Multiplayer requires Firebase. Please configure Firebase.");
+        return;
+      }
+      if (!hasHumanName()) {
+        alert("Please enter your name first.");
+        return;
+      }
+
+      const roomId = roomIdToJoin || joinRoomIdInput.value.trim().toUpperCase();
+      if (!roomId) {
+        alert("Please enter a room ID.");
+        return;
+      }
+
+      try {
+        const roomRef = db.collection("gameRooms").doc(roomId);
+        const roomDoc = await roomRef.get();
+
+        if (!roomDoc.exists) {
+          alert("Room not found. Please check the room ID.");
+          return;
+        }
+
+        const roomData = roomDoc.data();
+        if (roomData.player2) {
+          alert("Room is full.");
+          return;
+        }
+
+        const playerName = currentPlayerName || humanNameInput.value.trim();
+        currentRoomId = roomId;
+        isPlayer1 = false;
+        matchGameNumber = 0;
+        matchResults = { player1Wins: 0, draws: 0, player2Wins: 0 };
+
+        await roomRef.update({
+          player2: {
+            name: playerName,
+            mark: "O",
+            ready: true
+          },
+          lastMove: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        player2Name = playerName;
+        // Also set player1Name from room data if we're joining
+        const roomDataJoin = roomDoc.data();
+        if (roomDataJoin.player1) {
+          player1Name = roomDataJoin.player1.name;
+          // Update display immediately
+          const player1NameDisplay = document.getElementById("player1NameDisplay");
+          if (player1NameDisplay) {
+            player1NameDisplay.textContent = player1Name;
+          }
+        }
+        updateMultiplayerScoreDisplay();
+
+        hideRoomModal();
+        setupRoomListener(roomId);
+      } catch (error) {
+        console.error("Error joining room:", error);
+        alert("Failed to join room. Please try again.");
+      }
+    }
+
+    async function quickMatch() {
+      if (!firebaseInitialized || !db) {
+        alert("Multiplayer requires Firebase. Please configure Firebase.");
+        return;
+      }
+      if (!hasHumanName()) {
+        alert("Please enter your name first.");
+        return;
+      }
+
+      try {
+        // Look for rooms waiting for player2
+        const waitingRooms = await db.collection("gameRooms")
+          .where("player2", "==", null)
+          .limit(1)
+          .get();
+
+        if (!waitingRooms.empty) {
+          const roomDoc = waitingRooms.docs[0];
+          await joinRoom(roomDoc.id);
+        } else {
+          // No waiting rooms, create one
+          await createRoom();
+        }
+      } catch (error) {
+        console.error("Error in quick match:", error);
+        alert("Failed to find a match. Creating a room instead...");
+        await createRoom();
+      }
+    }
+
+    function setupRoomListener(roomId) {
+      if (roomListener) {
+        roomListener(); // Unsubscribe previous listener
+      }
+
+      roomListener = db.collection("gameRooms").doc(roomId).onSnapshot(
+        async (doc) => {
+          if (!doc.exists) {
+            // Room was deleted
+            if (currentRoomId === roomId) {
+              alert("Room was closed.");
+              leaveRoom();
+            }
+            return;
+          }
+
+          const roomData = doc.data();
+          
+          // Update UI
+          if (roomData.player1) {
+            roomPlayer1.textContent = roomData.player1.name;
+            player1Name = roomData.player1.name;
+            // Update display immediately
+            const player1NameDisplay = document.getElementById("player1NameDisplay");
+            if (player1NameDisplay) {
+              player1NameDisplay.textContent = player1Name;
+            }
+          }
+          if (roomData.player2) {
+            roomPlayer2.textContent = roomData.player2.name;
+            player2Name = roomData.player2.name;
+            opponentName = isPlayer1 ? roomData.player2.name : roomData.player1.name;
+            if (waitingRoomSection) {
+              waitingRoomSection.style.display = "none";
+            }
+            hideRoomModal();
+          } else {
+            // Player 2 hasn't joined yet
+            player2Name = "";
+          }
+          updateMultiplayerScoreDisplay();
+
+          // Sync game state
+          if (roomData.board && Array.isArray(roomData.board)) {
+            syncBoardFromFirestore(roomData);
+          } else if (roomData.player1 && roomData.player2 && !roomData.board) {
+            // Both players joined but no board yet - initialize game
+            const newBoard = createEmptyBoard();
+            await roomRef.update({
+              board: newBoard,
+              currentPlayer: "X",
+              gameOver: false,
+              winner: null,
+              matchGameNumber: 0,
+              matchResults: { player1Wins: 0, draws: 0, player2Wins: 0 },
+              lastMove: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
+
+          // Handle match progression
+          if (roomData.matchGameNumber !== undefined) {
+            matchGameNumber = roomData.matchGameNumber;
+          }
+          if (roomData.matchResults) {
+            matchResults = roomData.matchResults;
+          }
+        },
+        (error) => {
+          console.error("Room listener error:", error);
+        }
+      );
+    }
+
+    function syncBoardFromFirestore(roomData) {
+      if (!roomData.board) return;
+
+      board = roomData.board;
+      currentPlayer = roomData.currentPlayer || "X";
+      gameOver = roomData.gameOver || false;
+
+      // Update UI
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+          if (cell) {
+            cell.textContent = board[r][c] || "";
+            cell.classList.remove("X", "O", "last-move", "win");
+            if (board[r][c]) {
+              cell.classList.add(board[r][c]);
+            }
+          }
+        }
+      }
+
+      // Update player assignments based on match game
+      if (matchGameNumber === 0) {
+        // First game: player1 is X, player2 is O
+        humanPlayer = isPlayer1 ? "X" : "O";
+        computerPlayer = isPlayer1 ? "O" : "X";
+        myMarkInMatch = isPlayer1 ? "X" : "O";
+      } else {
+        // Second game: player1 is O, player2 is X
+        humanPlayer = isPlayer1 ? "O" : "X";
+        computerPlayer = isPlayer1 ? "X" : "O";
+        myMarkInMatch = isPlayer1 ? "O" : "X";
+      }
+
+      // Update cells UI
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        const r = parseInt(cell.dataset.row, 10);
+        const c = parseInt(cell.dataset.col, 10);
+        cell.textContent = board[r][c] || "";
+        cell.classList.remove("X", "O", "last-move", "win");
+        if (board[r][c]) {
+          cell.classList.add(board[r][c]);
+        }
+      });
+
+      // Update status
+      if (gameOver) {
+        if (roomData.winner) {
+          const winnerName = roomData.winner === humanPlayer 
+            ? (currentPlayerName || "You")
+            : opponentName;
+          setStatusWithMark(winnerName, roomData.winner, " wins!");
+        } else {
+          statusElem.textContent = "It's a draw!";
+        }
+        statusRow.className = "status-neutral";
+      } else {
+        setStatusForTurn();
+      }
+      
+      // Update score display
+      if (roomData.matchResults) {
+        matchResults = roomData.matchResults;
+        updateMultiplayerScoreDisplay();
+      }
+    }
+
+    async function leaveRoom() {
+      if (roomListener) {
+        roomListener();
+        roomListener = null;
+      }
+
+      if (currentRoomId && firebaseInitialized && db) {
+        try {
+          const roomRef = db.collection("gameRooms").doc(currentRoomId);
+          const roomDoc = await roomRef.get();
+          
+          if (roomDoc.exists) {
+            const roomData = roomDoc.data();
+            // Only delete if we're the only player, or update to remove us
+            if (isPlayer1 && !roomData.player2) {
+              await roomRef.delete();
+            } else if (!isPlayer1) {
+              await roomRef.update({ player2: null });
+            }
+          }
+        } catch (error) {
+          console.error("Error leaving room:", error);
+        }
+      }
+
+      currentRoomId = null;
+      isPlayer1 = false;
+      opponentName = "";
+      player1Name = "";
+      player2Name = "";
+      matchGameNumber = 0;
+      matchResults = { player1Wins: 0, draws: 0, player2Wins: 0 };
+      currentMatchScore = { player1: 0, player2: 0 };
+      // Stop loading animation
+      if (loadingDotsInterval) {
+        clearInterval(loadingDotsInterval);
+        loadingDotsInterval = null;
+      }
+      updateMultiplayerScoreDisplay();
+    }
+
+    // Scoring system: Win = 2pts, Draw = 1pt each, Loss = 0pts
+    function calculateMatchScore(player1Wins, draws, player2Wins) {
+      // Win=2, Draw=1, Loss=0
+      const player1Score = (player1Wins * 2) + (draws * 1);
+      const player2Score = (player2Wins * 2) + (draws * 1);
+      return { player1Score, player2Score };
+    }
+
+    async function handleMultiplayerGameEnd(winner, result) {
+      if (!currentRoomId || !firebaseInitialized || !db) return;
+
+      try {
+        const roomRef = db.collection("gameRooms").doc(currentRoomId);
+        const roomDoc = await roomRef.get();
+        if (!roomDoc.exists) return;
+
+        const roomData = roomDoc.data();
+        let updatedMatchResults = { ...matchResults };
+
+        // Update match results based on game outcome
+        if (result === "draw") {
+          updatedMatchResults.draws++;
+          playSound("draw");
+          statusElem.textContent = "It's a draw!";
+        } else if (winner) {
+          const iWon = (isPlayer1 && winner === "X" && matchGameNumber === 0) ||
+                      (isPlayer1 && winner === "O" && matchGameNumber === 1) ||
+                      (!isPlayer1 && winner === "O" && matchGameNumber === 0) ||
+                      (!isPlayer1 && winner === "X" && matchGameNumber === 1);
+          
+          if (iWon) {
+            if (isPlayer1) {
+              updatedMatchResults.player1Wins++;
+            } else {
+              updatedMatchResults.player2Wins++;
+            }
+            playSound("applause");
+            createConfetti();
+            const winnerName = getHumanDisplayName();
+            setStatusWithMark(winnerName, winner, " wins!");
+          } else {
+            if (isPlayer1) {
+              updatedMatchResults.player2Wins++;
+            } else {
+              updatedMatchResults.player1Wins++;
+            }
+            playSound("aw");
+            setStatusWithMark(opponentName, winner, " wins!");
+          }
+        }
+
+        matchResults = updatedMatchResults;
+        updateMultiplayerScoreDisplay(); // Update score display
+
+        // Update Firestore
+        await roomRef.update({
+          gameOver: true,
+          winner: winner,
+          matchResults: updatedMatchResults,
+          lastMove: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Check if match is complete (2 games played)
+        const totalGames = updatedMatchResults.player1Wins + updatedMatchResults.player2Wins + updatedMatchResults.draws;
+        
+        if (totalGames >= 2) {
+          // Match complete - calculate final scores and update leaderboard
+          await completeMatch(updatedMatchResults, roomData);
+        } else {
+          // Start next game in match
+          setTimeout(async () => {
+            await startNextMatchGame();
+          }, 3000);
+        }
+
+        statusRow.className = "status-neutral";
+        resetGameState();
+      } catch (error) {
+        console.error("Error handling multiplayer game end:", error);
+      }
+    }
+
+    async function startNextMatchGame() {
+      if (!currentRoomId || !firebaseInitialized || !db) return;
+
+      matchGameNumber = 1; // Second game
+      gameOver = false;
+      board = createEmptyBoard();
+      resetGameState();
+
+      // Swap marks: player1 becomes O, player2 becomes X
+      const roomRef = db.collection("gameRooms").doc(currentRoomId);
+      await roomRef.update({
+        board: board,
+        currentPlayer: "X",
+        gameOver: false,
+        winner: null,
+        matchGameNumber: 1,
+        lastMove: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // Update UI
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.classList.remove("X", "O", "last-move", "win");
+      });
+
+      // Update player assignments
+      humanPlayer = isPlayer1 ? "O" : "X";
+      computerPlayer = isPlayer1 ? "X" : "O";
+      myMarkInMatch = humanPlayer;
+      currentPlayer = "X";
+
+      updateMultiplayerScoreDisplay();
+      setStatusForTurn();
+    }
+
+    async function completeMatch(matchResults, roomData) {
+      if (!firebaseInitialized || !db) return;
+
+      const scores = calculateMatchScore(matchResults.player1Wins, matchResults.draws, matchResults.player2Wins);
+      const player1Name = roomData.player1?.name || "";
+      const player2Name = roomData.player2?.name || "";
+
+      // Update leaderboard
+      await updateLeaderboard(player1Name, player2Name, scores, matchResults);
+
+      // Show match results
+      const myName = isPlayer1 ? player1Name : player2Name;
+      const myScore = isPlayer1 ? scores.player1Score : scores.player2Score;
+      const opponentScore = isPlayer1 ? scores.player2Score : scores.player1Score;
+
+      let resultMessage = `Match Complete!\n\n`;
+      resultMessage += `Game 1: ${matchResults.player1Wins > 0 ? `${player1Name} (X) won` : matchResults.player2Wins > 0 ? `${player2Name} (O) won` : "Draw"}\n`;
+      resultMessage += `Game 2: ${matchResults.player2Wins > 0 ? `${player2Name} (X) won` : matchResults.player1Wins > 0 ? `${player1Name} (O) won` : "Draw"}\n\n`;
+      resultMessage += `Final Score:\n${myName}: ${myScore} pts\n${opponentName}: ${opponentScore} pts\n\n`;
+      
+      if (myScore > opponentScore) {
+        resultMessage += "🎉 You won the match!";
+      } else if (myScore < opponentScore) {
+        resultMessage += "😔 You lost the match.";
+      } else {
+        resultMessage += "🤝 Match is a tie!";
+      }
+
+      setTimeout(() => {
+        alert(resultMessage);
+        // Option to rematch or leave
+        const rematch = confirm("Would you like to rematch?");
+        if (rematch) {
+          startNewMatch();
+        } else {
+          leaveRoom();
+          gameMode = "training";
+          saveGameMode();
+          updateModeToggle();
+          restartGame();
+        }
+      }, 2000);
+    }
+
+    async function startNewMatch() {
+      if (!currentRoomId || !firebaseInitialized || !db) return;
+
+      matchGameNumber = 0;
+      matchResults = { player1Wins: 0, draws: 0, player2Wins: 0 };
+      gameOver = false;
+      board = createEmptyBoard();
+      resetGameState();
+
+      const roomRef = db.collection("gameRooms").doc(currentRoomId);
+      await roomRef.update({
+        board: board,
+        currentPlayer: "X",
+        gameOver: false,
+        winner: null,
+        matchGameNumber: 0,
+        matchResults: { player1Wins: 0, draws: 0, player2Wins: 0 },
+        lastMove: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // Update UI
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.classList.remove("X", "O", "last-move", "win");
+      });
+
+      // Reset player assignments
+      humanPlayer = isPlayer1 ? "X" : "O";
+      computerPlayer = isPlayer1 ? "O" : "X";
+      myMarkInMatch = humanPlayer;
+      currentPlayer = "X";
+
+      updateMultiplayerScoreDisplay();
+      setStatusForTurn();
+    }
+
+    async function updateLeaderboard(player1Name, player2Name, scores, matchResults) {
+      if (!firebaseInitialized || !db) return;
+
+      try {
+        // Update player1 stats
+        const p1Ref = db.collection("multiplayerLeaderboard").doc(player1Name.toLowerCase());
+        const p1Doc = await p1Ref.get();
+        const p1Data = p1Doc.exists ? p1Doc.data() : { name: player1Name, matchesPlayed: 0, wins: 0, draws: 0, losses: 0, totalPoints: 0 };
+        
+        p1Data.matchesPlayed = (p1Data.matchesPlayed || 0) + 1;
+        p1Data.totalPoints = (p1Data.totalPoints || 0) + scores.player1Score;
+        if (scores.player1Score > scores.player2Score) {
+          p1Data.wins = (p1Data.wins || 0) + 1;
+        } else if (scores.player1Score < scores.player2Score) {
+          p1Data.losses = (p1Data.losses || 0) + 1;
+        } else {
+          p1Data.draws = (p1Data.draws || 0) + 1;
+        }
+        p1Data.lastUpdated = firebase.firestore.FieldValue.serverTimestamp();
+        await p1Ref.set(p1Data, { merge: true });
+
+        // Update player2 stats
+        const p2Ref = db.collection("multiplayerLeaderboard").doc(player2Name.toLowerCase());
+        const p2Doc = await p2Ref.get();
+        const p2Data = p2Doc.exists ? p2Doc.data() : { name: player2Name, matchesPlayed: 0, wins: 0, draws: 0, losses: 0, totalPoints: 0 };
+        
+        p2Data.matchesPlayed = (p2Data.matchesPlayed || 0) + 1;
+        p2Data.totalPoints = (p2Data.totalPoints || 0) + scores.player2Score;
+        if (scores.player2Score > scores.player1Score) {
+          p2Data.wins = (p2Data.wins || 0) + 1;
+        } else if (scores.player2Score < scores.player1Score) {
+          p2Data.losses = (p2Data.losses || 0) + 1;
+        } else {
+          p2Data.draws = (p2Data.draws || 0) + 1;
+        }
+        p2Data.lastUpdated = firebase.firestore.FieldValue.serverTimestamp();
+        await p2Ref.set(p2Data, { merge: true });
+      } catch (error) {
+        console.error("Error updating leaderboard:", error);
+      }
+    }
+
     // Initialize sound
     const savedSound = localStorage.getItem("tictac9x9_sound");
     if (savedSound !== null) {
@@ -2707,6 +4525,44 @@
     }
     soundToggleBtn.classList.toggle("muted", !soundEnabled);
     soundToggleBtn.addEventListener("click", toggleSound);
+
+    // Mode toggle switches - initialize both with same content
+    function initializeToggle(toggleElement) {
+      if (toggleElement && !toggleElement.querySelector(".mode-option")) {
+        toggleElement.innerHTML = `
+          <div class="mode-option" data-mode="training">🎮</div>
+          <div class="mode-slider"></div>
+          <div class="mode-option" data-mode="multiplayer">👥</div>
+        `;
+      }
+    }
+
+    if (modeToggleSwitch) {
+      initializeToggle(modeToggleSwitch);
+      // Disabled for now - multiplayer coming soon
+      // modeToggleSwitch.addEventListener("click", toggleGameMode);
+    }
+    if (modeToggleSwitchMultiplayer) {
+      initializeToggle(modeToggleSwitchMultiplayer);
+      // Disabled for now - multiplayer coming soon
+      // modeToggleSwitchMultiplayer.addEventListener("click", toggleGameMode);
+    }
+    
+    // Room modal
+    roomModalClose.addEventListener("click", hideRoomModal);
+    roomModal.addEventListener("click", (e) => {
+      if (e.target === roomModal) hideRoomModal();
+    });
+    copyRoomIdBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(currentRoomId).then(() => {
+        copyRoomIdBtn.textContent = "✓ Copied!";
+        setTimeout(() => { copyRoomIdBtn.textContent = "📋 Copy Room ID"; }, 2000);
+      });
+    });
+    joinRoomConfirmBtn.addEventListener("click", () => joinRoom());
+    joinRoomIdInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") joinRoom();
+    });
 
     // Stats modal
     statsBtn.addEventListener("click", showStats);
@@ -2756,6 +4612,12 @@
       const newName = humanNameInput.value.trim();
       if (!newName) {
         alert("Please enter your name before clicking Set.");
+        return;
+      }
+      
+      if (newName.length < 3) {
+        alert("Name must be at least 3 characters long.");
+        humanNameInput.focus();
         return;
       }
 
@@ -2815,7 +4677,9 @@
           };
         }
         
-        updateStreakDisplays();
+        if (gameMode === "training") {
+          updateStreakDisplays();
+        }
         updateStatsDisplay(); // Update stats modal display
       }
       
@@ -2853,9 +4717,15 @@
         const nameToUse = pendingName; // Save name before hiding modal
         const isValid = await verifyPassword(nameToUse, password);
         if (isValid) {
+          // Copy name to main input field
+          humanNameInput.value = nameToUse;
+          
           hideRegisterModal();
           await completeNameSetup(nameToUse, true); // Force load stats on login
           updateStatsDisplay(); // Update stats display after loading
+          if (!gameOver && board.every(row => row.every(cell => cell === ""))) {
+            startNewRound();
+          }
         } else {
           alert("Incorrect password. Please try again.");
           registerPassword.value = "";
@@ -2870,9 +4740,19 @@
         }
         const success = await registerName(nameToUse, password);
         if (success) {
+          // Copy name to main input field
+          humanNameInput.value = nameToUse;
+          
           hideRegisterModal();
           await completeNameSetup(nameToUse, true); // Force load stats on registration
           updateStatsDisplay(); // Update stats display after loading
+          if (!gameOver && board.every(row => row.every(cell => cell === ""))) {
+            startNewRound();
+          }
+        } else {
+          alert("Registration failed. The name might already be registered.");
+          registerPassword.value = "";
+          registerPassword.focus();
         }
       }
     });
@@ -2884,8 +4764,14 @@
         hideRegisterModal();
         return;
       }
+      // Copy name to main input field
+      humanNameInput.value = nameToUse;
+      
       hideRegisterModal();
       await completeNameSetup(nameToUse);
+      if (!gameOver && board.every(row => row.every(cell => cell === ""))) {
+        startNewRound();
+      }
     });
     registerModal.addEventListener("click", (e) => {
       if (e.target === registerModal) hideRegisterModal();
@@ -2897,24 +4783,119 @@
       }
     });
 
-    function setStatusForTurn() {
-      if (!hasHumanName()) {
-        statusElem.textContent = "Enter your name above to start playing";
-        statusRow.className = "status-neutral";
+    // Name Selection Modal handlers - real-time checking with debounce
+    nameSelectionInput.addEventListener("input", () => {
+      // Clear previous timeout
+      if (nameCheckTimeout) {
+        clearTimeout(nameCheckTimeout);
+      }
+      
+      // Debounce the check - wait 500ms after user stops typing
+      nameCheckTimeout = setTimeout(() => {
+        checkNameAndUpdateModal();
+      }, 500);
+    });
+
+    nameSelectionStartBtn.addEventListener("click", async () => {
+      const name = nameSelectionInput.value.trim();
+      if (name.length < 3) {
+        alert("Name must be at least 3 characters long.");
+        nameSelectionInput.focus();
+        return;
+      }
+      
+      // Copy name to main input field
+      humanNameInput.value = name;
+      
+      hideNameSelectionModal();
+      await completeNameSetup(name);
+      startNewRound();
+    });
+
+    nameSelectionRegisterBtn.addEventListener("click", async () => {
+      const name = nameSelectionInput.value.trim();
+      if (name.length < 3) {
+        alert("Name must be at least 3 characters long.");
+        nameSelectionInput.focus();
+        return;
+      }
+      
+      // Copy name to main input field
+      humanNameInput.value = name;
+      
+      // Show registration modal
+      pendingName = name;
+      showRegisterModal(name, false);
+      hideNameSelectionModal();
+    });
+
+    nameSelectionLoginBtn.addEventListener("click", async () => {
+      const name = nameSelectionInput.value.trim();
+      const password = nameSelectionPassword.value.trim();
+      
+      if (name.length < 3) {
+        alert("Name must be at least 3 characters long.");
+        nameSelectionInput.focus();
+        return;
+      }
+      
+      if (!password) {
+        alert("Please enter your password.");
+        nameSelectionPassword.focus();
+        return;
+      }
+      
+      // Verify password
+      const isValid = await verifyPassword(name, password);
+      if (isValid) {
+        // Copy name to main input field
+        humanNameInput.value = name;
+        
+        hideNameSelectionModal();
+        await completeNameSetup(name, true); // Force load stats on login
+        updateStatsDisplay();
+        startNewRound();
+      } else {
+        alert("Incorrect password. Please try again.");
+        nameSelectionPassword.value = "";
+        nameSelectionPassword.focus();
+      }
+    });
+
+    nameSelectionInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const name = nameSelectionInput.value.trim();
+        if (name.length < 3) {
+          return; // Don't proceed if name is too short
+        }
+        
+        // If buttons are visible, trigger the appropriate one
+        if (nameSelectionPasswordSection.style.display !== "none" && nameSelectionLoginBtn.style.display !== "none") {
+          nameSelectionLoginBtn.click();
+        } else if (nameSelectionStartBtn.style.display !== "none") {
+          nameSelectionStartBtn.click();
+        }
+      }
+    });
+
+    nameSelectionPassword.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        nameSelectionLoginBtn.click();
+      }
+    });
+
+    nameSelectionModal.addEventListener("click", (e) => {
+      if (e.target === nameSelectionModal) {
+        // Don't allow closing by clicking outside - user must enter name
+      }
+    });
+
+    function startNewRound() {
+      if (gameMode === "multiplayer" && currentRoomId) {
+        // In multiplayer, don't reset - wait for sync from Firestore
         return;
       }
 
-      if (currentPlayer === humanPlayer) {
-        const name = getHumanDisplayName();
-        setStatusWithMark(name, currentPlayer, " – your turn");
-        statusRow.className = "status-your-turn";
-      } else {
-        setStatusWithMark(getComputerDisplayName(), currentPlayer, " is thinking...");
-        statusRow.className = "status-computer-turn";
-      }
-    }
-
-    function startNewRound() {
       // Cancel any pending computer move
       if (computerMoveTimeoutId !== null) {
         clearTimeout(computerMoveTimeoutId);
@@ -2938,7 +4919,11 @@
       });
 
       shareGameResultBtn.classList.remove("visible");
-      updateStreakDisplays();
+      if (gameMode === "training") {
+        updateStreakDisplays();
+      } else if (gameMode === "multiplayer") {
+        updateMultiplayerScoreDisplay();
+      }
 
       // Prepare status and possibly trigger computer's opening move
       if (!hasHumanName()) {
@@ -2957,11 +4942,36 @@
     }
 
     async function init() {
+      // Set initial state before any rendering
+      gameMode = "training"; // Default to training mode
+      // Don't load saved mode - always start with training
+      // loadGameMode(); // Load game mode preference (may override default)
+      
+      // Initialize board first
       initBoardUI();
+      
+      // Initialize toggle switches
+      if (modeToggleSwitch) {
+        initializeToggle(modeToggleSwitch);
+      }
+      if (modeToggleSwitchMultiplayer) {
+        initializeToggle(modeToggleSwitchMultiplayer);
+      }
+      
+      // Initialize UI state after DOM elements exist
+      if (modeToggleSwitch && modeToggleSwitchMultiplayer) {
+        updateModeToggle();
+      }
+      
       await loadBestStreak(); // Load global best streak from Firebase
       await loadGlobalStats(); // Load global stats from Firestore
       loadAchievements();
       updateAchievementsDisplay();
+      
+      // Update toggle again after everything is loaded
+      if (modeToggleSwitch && modeToggleSwitchMultiplayer) {
+        updateModeToggle();
+      }
       
       // Try to restore saved player name
       try {
@@ -2978,12 +4988,16 @@
             } else {
               // Not registered, just set the name without loading stats
               currentPlayerName = savedName;
-              updateStreakDisplays();
+              if (gameMode === "training") {
+                updateStreakDisplays();
+              }
             }
           } else {
             // Firebase not configured, just set the name
             currentPlayerName = savedName;
-            updateStreakDisplays();
+            if (gameMode === "training") {
+              updateStreakDisplays();
+            }
           }
         } else {
           humanNameInput.value = "";
@@ -2992,14 +5006,89 @@
         humanNameInput.value = "";
       }
       
-      updateStreakDisplays();
-      
-      // Show popup message at the beginning only if no name is set
-      if (!currentPlayerName) {
-        alert("Welcome! Please enter your name and click 'Set' before you can start playing. The game cannot start until you fill in your name.");
+      if (gameMode === "training") {
+        updateStreakDisplays();
       }
       
-      startNewRound();
+      // Show name selection modal if no name is set
+      if (!currentPlayerName) {
+        showNameSelectionModal();
+      } else {
+        startNewRound();
+      }
+    }
+
+    // Leaderboard functions
+    async function loadLeaderboard() {
+      if (!firebaseInitialized || !db) return [];
+
+      try {
+        const snapshot = await db.collection("multiplayerLeaderboard")
+          .orderBy("totalPoints", "desc")
+          .limit(100)
+          .get();
+        
+        return snapshot.docs.map(doc => doc.data());
+      } catch (error) {
+        console.error("Error loading leaderboard:", error);
+        return [];
+      }
+    }
+
+    async function showLeaderboardModal() {
+      const leaderboard = await loadLeaderboard();
+      
+      // Create or update leaderboard modal
+      let leaderboardModal = document.getElementById("leaderboardModal");
+      if (!leaderboardModal) {
+        leaderboardModal = document.createElement("div");
+        leaderboardModal.id = "leaderboardModal";
+        leaderboardModal.className = "modal";
+        leaderboardModal.innerHTML = `
+          <div class="modal-content" style="max-width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h2 style="margin: 0;">🏆 Leaderboard</h2>
+              <button id="leaderboardModalClose" class="icon-button" style="font-size: 20px;">✕</button>
+            </div>
+            <div id="leaderboardContent" style="max-height: 500px; overflow-y: auto;"></div>
+          </div>
+        `;
+        document.body.appendChild(leaderboardModal);
+        
+        document.getElementById("leaderboardModalClose").addEventListener("click", () => {
+          leaderboardModal.classList.remove("show");
+        });
+        leaderboardModal.addEventListener("click", (e) => {
+          if (e.target === leaderboardModal) leaderboardModal.classList.remove("show");
+        });
+      }
+      
+      const leaderboardContent = document.getElementById("leaderboardContent");
+      leaderboardContent.innerHTML = leaderboard.length === 0 
+        ? '<div style="text-align: center; color: var(--text-secondary); padding: 40px;">No matches played yet. Be the first!</div>'
+        : leaderboard.map((player, idx) => `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--app-border); ${idx < 3 ? 'background: var(--cell-bg);' : ''}">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-weight: 700; font-size: 18px; width: 30px; text-align: center; color: ${idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : 'var(--text-primary)'};">${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}</div>
+              <div>
+                <div style="font-weight: 600; font-size: 16px;">${escapeHtml(player.name)}</div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                  ${player.wins || 0}W ${player.draws || 0}D ${player.losses || 0}L • ${player.matchesPlayed || 0} matches
+                </div>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 700; font-size: 20px; color: var(--accent);">${player.totalPoints || 0}</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">points</div>
+            </div>
+          </div>
+        `).join('');
+      
+      leaderboardModal.classList.add("show");
+    }
+
+    if (leaderboardBtn) {
+      leaderboardBtn.addEventListener("click", showLeaderboardModal);
     }
 
     init();
