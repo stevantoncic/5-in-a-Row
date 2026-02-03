@@ -1374,8 +1374,17 @@
 
     async function checkNameRegistered(name) {
       if (!firebaseInitialized || !db) return false;
+      if (!name || !name.trim()) {
+        console.log("checkNameRegistered called with empty name");
+        return false;
+      }
       try {
-        const doc = await db.collection("registeredNames").doc(name.toLowerCase()).get();
+        const nameLower = name.toLowerCase().trim();
+        if (!nameLower) {
+          console.log("checkNameRegistered: name is empty after trim");
+          return false;
+        }
+        const doc = await db.collection("registeredNames").doc(nameLower).get();
         return doc.exists;
       } catch (error) {
         console.error("Error checking name:", error);
@@ -2018,8 +2027,16 @@
         console.log("Cannot load stats: Firebase not initialized");
         return false;
       }
+      if (!name || !name.trim()) {
+        console.log("loadPlayerStats called with empty name");
+        return false;
+      }
       try {
-        const nameLower = name.toLowerCase();
+        const nameLower = name.toLowerCase().trim();
+        if (!nameLower) {
+          console.log("loadPlayerStats: name is empty after trim");
+          return false;
+        }
         console.log("Loading stats for:", nameLower);
         const doc = await db.collection("playerStats").doc(nameLower).get();
         if (doc.exists) {
@@ -2048,8 +2065,16 @@
         console.log("Cannot save stats: Firebase not initialized");
         return;
       }
+      if (!name || !name.trim()) {
+        console.log("savePlayerStats called with empty name");
+        return;
+      }
       try {
-        const nameLower = name.toLowerCase();
+        const nameLower = name.toLowerCase().trim();
+        if (!nameLower) {
+          console.log("savePlayerStats: name is empty after trim");
+          return;
+        }
         const existingDoc = await db.collection("playerStats").doc(nameLower).get();
         const existingBestStreak = existingDoc.exists ? (existingDoc.data().bestStreak || 0) : 0;
         const newBestStreak = Math.max(currentStreak, existingBestStreak);
@@ -2073,22 +2098,95 @@
       }
     }
 
-    function loadStats() {
-      try {
-        const savedGlobal = localStorage.getItem("tictac9x9_global_stats");
-        if (savedGlobal) {
-          globalStats = JSON.parse(savedGlobal);
+    async function loadGlobalStats() {
+      if (!firebaseInitialized || !db) {
+        // Fallback to localStorage if Firebase not available
+        try {
+          const savedGlobal = localStorage.getItem("tictac9x9_global_stats");
+          if (savedGlobal) {
+            globalStats = JSON.parse(savedGlobal);
+          }
+        } catch (e) {
+          // ignore errors
         }
-        // Current player stats reset when name changes, so don't load them from localStorage
-        // They will be loaded from Firestore if user is registered
-      } catch (e) {
-        // ignore errors
+        return;
       }
+      
+      try {
+        const doc = await db.collection("globalStats").doc("allPlayers").get();
+        if (doc.exists) {
+          const data = doc.data();
+          globalStats = {
+            gamesPlayed: data.gamesPlayed || 0,
+            wins: data.wins || 0,
+            losses: data.losses || 0,
+            draws: data.draws || 0
+          };
+          console.log("Loaded global stats from Firestore:", globalStats);
+        } else {
+          console.log("No global stats document found, using defaults");
+        }
+      } catch (error) {
+        console.error("Error loading global stats:", error);
+        // Fallback to localStorage
+        try {
+          const savedGlobal = localStorage.getItem("tictac9x9_global_stats");
+          if (savedGlobal) {
+            globalStats = JSON.parse(savedGlobal);
+          }
+        } catch (e) {
+          // ignore errors
+        }
+      }
+    }
+
+    async function saveGlobalStats() {
+      if (!firebaseInitialized || !db) {
+        // Fallback to localStorage if Firebase not available
+        try {
+          localStorage.setItem("tictac9x9_global_stats", JSON.stringify(globalStats));
+        } catch (e) {
+          // ignore errors
+        }
+        return;
+      }
+      
+      try {
+        await db.collection("globalStats").doc("allPlayers").set({
+          gamesPlayed: globalStats.gamesPlayed,
+          wins: globalStats.wins,
+          losses: globalStats.losses,
+          draws: globalStats.draws,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        console.log("Saved global stats to Firestore:", globalStats);
+        
+        // Also save to localStorage as backup
+        try {
+          localStorage.setItem("tictac9x9_global_stats", JSON.stringify(globalStats));
+        } catch (e) {
+          // ignore errors
+        }
+      } catch (error) {
+        console.error("Error saving global stats:", error);
+        // Fallback to localStorage
+        try {
+          localStorage.setItem("tictac9x9_global_stats", JSON.stringify(globalStats));
+        } catch (e) {
+          // ignore errors
+        }
+      }
+    }
+
+    function loadStats() {
+      // This function is kept for compatibility but now calls async version
+      // It will be called from init() which is async
     }
 
     async function saveStats() {
       try {
-        localStorage.setItem("tictac9x9_global_stats", JSON.stringify(globalStats));
+        // Save global stats to Firestore (shared across all devices)
+        await saveGlobalStats();
         
         // Get player name from variable or input field
         const playerName = currentPlayerName || humanNameInput.value.trim();
@@ -2677,6 +2775,10 @@
     });
 
     async function completeNameSetup(name, forceLoadStats = false) {
+      if (!name || !name.trim()) {
+        console.log("completeNameSetup called with empty name");
+        return;
+      }
       const nameChanged = name.toLowerCase() !== currentPlayerName.toLowerCase();
 
       // Reset streak and current player stats when name changes, or force load stats
@@ -2839,7 +2941,7 @@
     async function init() {
       initBoardUI();
       await loadBestStreak(); // Load global best streak from Firebase
-      loadStats();
+      await loadGlobalStats(); // Load global stats from Firestore
       loadAchievements();
       updateAchievementsDisplay();
       
