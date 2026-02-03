@@ -1579,7 +1579,7 @@
       return humanNameInput.value.trim().length > 0;
     }
 
-    function handleMove(r, c, isComputer) {
+    async function handleMove(r, c, isComputer) {
       if (gameOver) return;
 
       // Track if this is a blocking move (check before placing)
@@ -2013,22 +2013,75 @@
 
     // ---- Statistics ----
 
+    async function loadPlayerStats(name) {
+      if (!firebaseInitialized || !db) return false;
+      try {
+        const nameLower = name.toLowerCase();
+        const doc = await db.collection("playerStats").doc(nameLower).get();
+        if (doc.exists) {
+          const data = doc.data();
+          currentPlayerStats = {
+            gamesPlayed: data.gamesPlayed || 0,
+            wins: data.wins || 0,
+            losses: data.losses || 0,
+            draws: data.draws || 0
+          };
+          currentStreak = data.currentStreak || 0;
+          return true;
+        }
+      } catch (error) {
+        console.error("Error loading player stats:", error);
+      }
+      return false;
+    }
+
+    async function savePlayerStats(name) {
+      if (!firebaseInitialized || !db) return;
+      try {
+        const nameLower = name.toLowerCase();
+        const existingDoc = await db.collection("playerStats").doc(nameLower).get();
+        const existingBestStreak = existingDoc.exists ? (existingDoc.data().bestStreak || 0) : 0;
+        const newBestStreak = Math.max(currentStreak, existingBestStreak);
+        
+        await db.collection("playerStats").doc(nameLower).set({
+          name: name,
+          gamesPlayed: currentPlayerStats.gamesPlayed,
+          wins: currentPlayerStats.wins,
+          losses: currentPlayerStats.losses,
+          draws: currentPlayerStats.draws,
+          currentStreak: currentStreak,
+          bestStreak: newBestStreak,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (error) {
+        console.error("Error saving player stats:", error);
+      }
+    }
+
     function loadStats() {
       try {
         const savedGlobal = localStorage.getItem("tictac9x9_global_stats");
         if (savedGlobal) {
           globalStats = JSON.parse(savedGlobal);
         }
-        // Current player stats reset when name changes, so don't load them
+        // Current player stats reset when name changes, so don't load them from localStorage
+        // They will be loaded from Firestore if user is registered
       } catch (e) {
         // ignore errors
       }
     }
 
-    function saveStats() {
+    async function saveStats() {
       try {
         localStorage.setItem("tictac9x9_global_stats", JSON.stringify(globalStats));
-        // Current player stats are not saved - they reset with name change
+        
+        // Save player stats to Firestore if user is registered
+        if (currentPlayerName && firebaseInitialized && db) {
+          const isRegistered = await checkNameRegistered(currentPlayerName);
+          if (isRegistered) {
+            await savePlayerStats(currentPlayerName);
+          }
+        }
       } catch (e) {
         // ignore errors
       }
@@ -2599,17 +2652,37 @@
 
       // Reset streak and current player stats when name changes
       if (nameChanged) {
-        currentStreak = 0;
-        currentPlayerStats = {
-          gamesPlayed: 0,
-          wins: 0,
-          losses: 0,
-          draws: 0
-        };
+        // Try to load player stats from Firestore first if registered
+        let statsLoaded = false;
+        if (firebaseInitialized && db) {
+          const isRegistered = await checkNameRegistered(name);
+          if (isRegistered) {
+            statsLoaded = await loadPlayerStats(name);
+          }
+        }
+        
+        // Only reset if we didn't load stats (new name or not registered)
+        if (!statsLoaded) {
+          currentStreak = 0;
+          currentPlayerStats = {
+            gamesPlayed: 0,
+            wins: 0,
+            losses: 0,
+            draws: 0
+          };
+        }
+        
         updateStreakDisplays();
       }
       
       currentPlayerName = name;
+      
+      // Save name to localStorage for persistence
+      try {
+        localStorage.setItem("tictac9x9_currentPlayerName", name);
+      } catch (e) {
+        // ignore errors
+      }
       
       // Update status and potentially start/continue game
       setStatusForTurn();
@@ -2737,12 +2810,41 @@
       loadAchievements();
       updateAchievementsDisplay();
       
-      // Set some pleasant defaults
-      humanNameInput.value = "";
+      // Try to restore saved player name
+      try {
+        const savedName = localStorage.getItem("tictac9x9_currentPlayerName");
+        if (savedName && savedName.trim()) {
+          humanNameInput.value = savedName;
+          // Check if registered and load stats
+          if (firebaseInitialized && db) {
+            const isRegistered = await checkNameRegistered(savedName);
+            if (isRegistered) {
+              // Auto-load stats for registered user
+              await completeNameSetup(savedName);
+              updateStatsDisplay(); // Update stats display after loading
+            } else {
+              // Not registered, just set the name without loading stats
+              currentPlayerName = savedName;
+              updateStreakDisplays();
+            }
+          } else {
+            // Firebase not configured, just set the name
+            currentPlayerName = savedName;
+            updateStreakDisplays();
+          }
+        } else {
+          humanNameInput.value = "";
+        }
+      } catch (e) {
+        humanNameInput.value = "";
+      }
+      
       updateStreakDisplays();
       
-      // Show popup message at the beginning
-      alert("Welcome! Please enter your name and click 'Set' before you can start playing. The game cannot start until you fill in your name.");
+      // Show popup message at the beginning only if no name is set
+      if (!currentPlayerName) {
+        alert("Welcome! Please enter your name and click 'Set' before you can start playing. The game cannot start until you fill in your name.");
+      }
       
       startNewRound();
     }
