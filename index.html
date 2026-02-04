@@ -13,68 +13,99 @@
   <meta name="twitter:title" content="5-in-a-Row - Challenge the AI!" />
   <meta name="twitter:description" content="Play 5-in-a-Row against a challenging AI. Track your stats, unlock achievements, and compete for the global best streak!" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
     :root {
-      --bg-main: linear-gradient(165deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-      --board-bg: #e2e8f0;
+      --bg-main: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+      --board-bg: linear-gradient(145deg, #f0f4f8 0%, #e2e8f0 100%);
       --cell-bg: #ffffff;
-      --cell-bg-hover: #f8fafc;
-      --x-color: #dc2626;
-      --o-color: #2563eb;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-      --shadow-soft: var(--shadow-xl);
-      --shadow-soft-inner: inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+      --cell-bg-hover: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      --x-color: #ef4444;
+      --o-color: #3b82f6;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --success: #10b981;
+      --success-hover: #059669;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+      --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --shadow-soft-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
       --text-primary: #0f172a;
       --text-secondary: #64748b;
-      --app-bg: rgba(255, 255, 255, 0.95);
-      --app-border: rgba(226, 232, 240, 0.9);
-      --player-tag-bg: rgba(248, 250, 252, 0.95);
-      --player-tag-border: rgba(226, 232, 240, 0.9);
-      --input-bg: #ffffff;
-      --input-border: #e2e8f0;
+      --app-bg: rgba(255, 255, 255, 0.85);
+      --app-border: rgba(255, 255, 255, 0.3);
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --player-tag-bg: rgba(255, 255, 255, 0.9);
+      --player-tag-border: rgba(226, 232, 240, 0.8);
+      --input-bg: rgba(255, 255, 255, 0.95);
+      --input-border: rgba(226, 232, 240, 0.8);
       --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 24px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
       --radius-full: 9999px;
     }
 
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     [data-theme="dark"] {
-      --bg-main: linear-gradient(165deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-      --board-bg: #0f172a;
-      --cell-bg: #334155;
-      --cell-bg-hover: #475569;
-      --x-color: #f87171;
-      --o-color: #60a5fa;
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-      --shadow-soft: var(--shadow-xl);
-      --shadow-soft-inner: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --app-bg: rgba(15, 23, 42, 0.96);
-      --app-border: rgba(51, 65, 85, 0.8);
-      --player-tag-bg: rgba(30, 41, 59, 0.9);
-      --player-tag-border: rgba(71, 85, 105, 0.6);
-      --input-bg: #1e293b;
-      --input-border: #475569;
+      --bg-main: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #252b45 50%, #1e2338 75%, #0f1428 100%);
+      --board-bg: linear-gradient(145deg, #1a2332 0%, #1e293b 100%);
+      --cell-bg: linear-gradient(145deg, #334155 0%, #2d3748 100%);
+      --cell-bg-hover: linear-gradient(145deg, #475569 0%, #3d4757 100%);
+      --x-color: #ff6b6b;
+      --o-color: #4dabf7;
+      --accent: #5c7cfa;
+      --accent-hover: #4c6ef5;
+      --success: #51cf66;
+      --success-hover: #40c057;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.7), 0 8px 16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-glow: 0 0 30px rgba(92, 124, 250, 0.4), 0 0 60px rgba(92, 124, 250, 0.2);
+      --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      --shadow-soft-inner: inset 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --app-bg: rgba(15, 23, 42, 0.92);
+      --app-border: rgba(148, 163, 184, 0.2);
+      --glass-bg: rgba(30, 41, 59, 0.7);
+      --glass-border: rgba(148, 163, 184, 0.15);
+      --player-tag-bg: rgba(30, 41, 59, 0.8);
+      --player-tag-border: rgba(148, 163, 184, 0.2);
+      --input-bg: rgba(30, 41, 59, 0.8);
+      --input-border: rgba(148, 163, 184, 0.25);
     }
 
     [data-theme="dark"] .cell {
-      border-color: rgba(255, 255, 255, 0.08);
+      border-color: rgba(203, 213, 225, 0.3);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    [data-theme="dark"] .cell:hover {
+      border-color: rgba(92, 124, 250, 0.7);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 12px rgba(92, 124, 250, 0.4), 0 0 0 2px rgba(92, 124, 250, 0.5);
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .cell::after {
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), transparent 70%);
     }
 
     [data-theme="dark"] .cell.win {
-      background: linear-gradient(135deg, #422006, #78350f);
-      color: #fcd34d;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+      color: #fef3c7;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-color: rgba(245, 158, 11, 0.6);
     }
 
     * {
@@ -84,8 +115,10 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg-main);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -95,14 +128,14 @@
     }
 
     .app {
-      background: var(--app-bg);
+      background: var(--glass-bg);
       border-radius: var(--radius-xl);
       padding: 12px 8px 14px;
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--app-border);
-      transition: background 0.3s ease, border-color 0.3s ease;
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
       width: 100%;
       max-width: 500px;
       margin: 0 auto;
@@ -197,11 +230,17 @@
     h1 {
       margin: 0 0 8px;
       margin-top: -8px;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
       text-align: center;
-      color: var(--text-primary);
+      background: linear-gradient(135deg, var(--accent), #8b5cf6, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradientShift 8s ease infinite;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     #streak-bar {
@@ -229,16 +268,18 @@
       font-weight: 600;
       white-space: nowrap;
       font-size: 13px;
+      font-family: 'Inter', system-ui, sans-serif;
       color: var(--text-primary);
       background: rgba(251, 191, 36, 0.1);
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: var(--radius-md);
       border: 1px solid rgba(251, 191, 36, 0.2);
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
       box-sizing: border-box;
+      box-shadow: var(--shadow-sm);
     }
 
     #bestStreakDisplay:hover {
@@ -250,23 +291,26 @@
       margin-left: auto;
       font-weight: 600;
       font-size: 13px;
+      font-family: 'Inter', system-ui, sans-serif;
       color: var(--text-primary);
       background: rgba(37, 99, 235, 0.1);
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: var(--radius-md);
       border: 1px solid rgba(37, 99, 235, 0.2);
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       flex-shrink: 0;
       box-sizing: border-box;
+      box-shadow: var(--shadow-sm);
     }
 
     #currentStreakDisplay:hover {
       background: rgba(37, 99, 235, 0.15);
       border-color: rgba(37, 99, 235, 0.3);
     }
+
 
     #multiplayer-score-bar {
       position: relative;
@@ -329,15 +373,16 @@
     .player-score-value {
       font-weight: 700;
       font-size: 18px;
+      font-family: 'Inter', system-ui, sans-serif;
       color: var(--accent);
       background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(37, 99, 235, 0.08));
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: var(--radius-md);
       border: 1px solid rgba(37, 99, 235, 0.25);
-      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+      box-shadow: var(--shadow-sm);
       min-width: 40px;
       text-align: center;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
       box-sizing: border-box;
       overflow: hidden;
@@ -378,16 +423,19 @@
       background: var(--cell-bg);
       padding: 6px 14px;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
+      font-family: 'Inter', system-ui, sans-serif;
       cursor: pointer;
       color: var(--text-primary);
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: var(--shadow-sm);
     }
 
     .name-button:hover {
       background: var(--cell-bg-hover);
       border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
     #players {
@@ -437,18 +485,26 @@
     .player-name-input {
       border-radius: var(--radius-md);
       border: 1px solid var(--input-border);
-      padding: 6px 12px;
+      padding: 8px 14px;
       font-size: 13px;
+      font-family: 'Inter', system-ui, sans-serif;
       min-width: 130px;
       outline: none;
       background: var(--input-bg);
       color: var(--text-primary);
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
     }
 
     .player-name-input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .player-name-input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
 
     #statusRow {
@@ -457,17 +513,18 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 6px;
-      min-height: 36px;
+      min-height: 40px;
       text-align: center;
-      padding: 6px 12px;
+      padding: 8px 14px;
       border-radius: var(--radius-md);
-      transition: background 0.3s ease, border-color 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       width: calc(9 * 44px + 8 * 4px);
       margin-left: auto;
       margin-right: auto;
       max-width: calc(100% - 16px);
       box-sizing: border-box;
       overflow: hidden;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     #statusRow.status-your-turn {
@@ -492,19 +549,94 @@
     }
 
     [data-theme="dark"] #statusRow.status-your-turn {
-      background: rgba(34, 197, 94, 0.15);
-      border-color: rgba(34, 197, 94, 0.3);
+      background: linear-gradient(135deg, rgba(81, 207, 102, 0.2), rgba(64, 192, 87, 0.15));
+      border-color: rgba(81, 207, 102, 0.4);
+      box-shadow: 0 0 15px rgba(81, 207, 102, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
     [data-theme="dark"] #statusRow.status-computer-turn {
-      background: rgba(148, 163, 184, 0.1);
-      border-color: rgba(148, 163, 184, 0.2);
+      background: linear-gradient(135deg, rgba(148, 163, 184, 0.15), rgba(100, 116, 139, 0.1));
+      border-color: rgba(148, 163, 184, 0.3);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* Enhanced dark mode styles for buttons and UI elements */
+    [data-theme="dark"] button:not(.icon-button):not(.name-button) {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] button:not(.icon-button):not(.name-button):hover {
+      box-shadow: 0 6px 16px rgba(92, 124, 250, 0.4), 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    [data-theme="dark"] .icon-button {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    [data-theme="dark"] .icon-button:hover {
+      box-shadow: 0 4px 8px rgba(92, 124, 250, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] .player-score-value {
+      background: linear-gradient(135deg, rgba(92, 124, 250, 0.25), rgba(92, 124, 250, 0.15));
+      border-color: rgba(92, 124, 250, 0.4);
+      box-shadow: 0 2px 6px rgba(92, 124, 250, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] .player-score-value:hover {
+      background: linear-gradient(135deg, rgba(92, 124, 250, 0.35), rgba(92, 124, 250, 0.2));
+      border-color: rgba(92, 124, 250, 0.5);
+      box-shadow: 0 4px 12px rgba(92, 124, 250, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    [data-theme="dark"] #bestStreakDisplay {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.15));
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] #bestStreakDisplay:hover {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(245, 158, 11, 0.2));
+      border-color: rgba(245, 158, 11, 0.5);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    [data-theme="dark"] #currentStreakDisplay {
+      background: linear-gradient(135deg, rgba(92, 124, 250, 0.2), rgba(92, 124, 250, 0.15));
+      border-color: rgba(92, 124, 250, 0.4);
+      box-shadow: 0 2px 6px rgba(92, 124, 250, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] #currentStreakDisplay:hover {
+      background: linear-gradient(135deg, rgba(92, 124, 250, 0.25), rgba(92, 124, 250, 0.2));
+      border-color: rgba(92, 124, 250, 0.5);
+      box-shadow: 0 4px 12px rgba(92, 124, 250, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="password"] {
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    [data-theme="dark"] input[type="text"]:focus,
+    [data-theme="dark"] input[type="password"]:focus {
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(92, 124, 250, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    [data-theme="dark"] .app {
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] #board-wrapper {
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(203, 213, 225, 0.15);
     }
 
     #status {
       font-size: 15px;
       text-align: center;
-      font-weight: 500;
+      font-weight: 600;
+      font-family: 'Inter', system-ui, sans-serif;
       flex: 1;
       width: 100%;
     }
@@ -566,7 +698,7 @@
       color: var(--text-primary);
       font-size: 16px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: var(--shadow-sm);
       display: flex;
       align-items: center;
@@ -585,10 +717,17 @@
     .icon-button:hover {
       background: var(--cell-bg-hover);
       border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
     .icon-button:active {
-      transform: scale(0.98);
+      transform: scale(0.95);
+    }
+
+    .icon-button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
 
     .icon-button.muted {
@@ -613,25 +752,36 @@
       justify-content: center;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #statsModal.show {
       display: flex;
+      opacity: 1;
     }
 
     #statsContent {
-      background: var(--app-bg);
+      background: var(--glass-bg);
       border-radius: var(--radius-xl);
       padding: 28px;
       max-width: 600px;
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--app-border);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
       color: var(--text-primary);
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #statsModal.show #statsContent {
+      transform: scale(1);
     }
 
     #statsContent h2 {
@@ -639,6 +789,10 @@
       font-size: 20px;
       font-weight: 700;
       text-align: center;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     #statsColumns {
@@ -662,6 +816,14 @@
       justify-content: space-between;
       padding: 12px 0;
       border-bottom: 1px solid var(--input-border);
+      transition: background 0.2s ease;
+      border-radius: var(--radius-sm);
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+
+    .stat-item:hover {
+      background: rgba(99, 102, 241, 0.05);
     }
 
     .stat-item:last-child {
@@ -704,7 +866,7 @@
       border-radius: var(--radius-lg);
       padding: 14px;
       text-align: center;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: var(--shadow-sm);
     }
 
@@ -712,6 +874,29 @@
       border-color: rgba(251, 191, 36, 0.5);
       background: rgba(251, 191, 36, 0.08);
       box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .achievement-item.unlocked::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .achievement-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
     }
 
     .achievement-item.locked {
@@ -751,25 +936,36 @@
       justify-content: center;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #trophyModal.show {
       display: flex;
+      opacity: 1;
     }
 
     #trophyContent {
-      background: var(--app-bg);
+      background: var(--glass-bg);
       border-radius: var(--radius-xl);
       padding: 28px;
       max-width: 700px;
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--app-border);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
       color: var(--text-primary);
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #trophyModal.show #trophyContent {
+      transform: scale(1);
     }
 
     #trophyContent h2 {
@@ -777,17 +973,23 @@
       font-size: 20px;
       font-weight: 700;
       text-align: center;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .achievement-notification {
       position: fixed;
       top: 20px;
       right: 20px;
-      background: var(--app-bg);
+      background: var(--glass-bg);
       border: 1px solid rgba(251, 191, 36, 0.5);
       border-radius: var(--radius-lg);
       padding: 16px 20px;
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       z-index: 3000;
       animation: slideInRight 0.5s ease-out;
       max-width: 300px;
@@ -840,30 +1042,44 @@
       justify-content: center;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #shareModal.show {
       display: flex;
+      opacity: 1;
     }
 
     #shareModalContent {
-      background: var(--app-bg);
+      background: var(--glass-bg);
       border-radius: var(--radius-xl);
       padding: 28px;
       max-width: 360px;
       width: 90%;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--app-border);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
       color: var(--text-primary);
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #shareModal.show #shareModalContent {
+      transform: scale(1);
     }
 
     #shareModalContent h3 {
       margin: 0 0 16px 0;
       font-size: 16px;
       text-align: center;
-      color: var(--text-primary);
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     /* Name Selection Modal (shown when no cached name) */
@@ -880,21 +1096,26 @@
       justify-content: center;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #nameSelectionModal.show {
       display: flex;
+      opacity: 1;
     }
 
     #nameSelectionModalContent {
-      background: var(--app-bg);
+      background: var(--glass-bg);
       border-radius: var(--radius-xl);
       padding: 28px;
       max-width: 480px;
       width: 90%;
       max-width: min(480px, calc(100vw - 32px));
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--app-border);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
       color: var(--text-primary);
       box-sizing: border-box;
       display: flex;
@@ -902,6 +1123,12 @@
       gap: 16px;
       margin: 0 auto;
       align-items: center;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #nameSelectionModal.show #nameSelectionModalContent {
+      transform: scale(1);
     }
 
     #nameSelectionModalContent h3 {
@@ -909,6 +1136,10 @@
       font-size: 20px;
       font-weight: 700;
       text-align: center;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     #nameSelectionInput,
@@ -937,21 +1168,26 @@
       justify-content: center;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #registerModal.show {
       display: flex;
+      opacity: 1;
     }
 
     #registerModalContent {
-      background: var(--app-bg);
+      background: var(--glass-bg);
       border-radius: var(--radius-xl);
       padding: 24px;
       max-width: 480px;
       width: 90%;
       max-width: min(480px, calc(100vw - 32px));
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--app-border);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
       color: var(--text-primary);
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
@@ -960,6 +1196,12 @@
       gap: 12px;
       margin: 0 auto;
       align-items: center;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #registerModal.show #registerModalContent {
+      transform: scale(1);
     }
 
     #registerModalContent h3 {
@@ -967,6 +1209,10 @@
       font-size: 18px;
       font-weight: 600;
       text-align: center;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     #registerModalMessage {
@@ -1078,23 +1324,34 @@
       justify-content: center;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #roomModal.show {
       display: flex;
+      opacity: 1;
     }
 
     #roomModalContent {
-      background: var(--app-bg);
+      background: var(--glass-bg);
       border-radius: var(--radius-xl);
       padding: 24px;
       max-width: 400px;
       width: 90%;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--app-border);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
       color: var(--text-primary);
       box-sizing: border-box;
       -webkit-overflow-scrolling: touch;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #roomModal.show #roomModalContent {
+      transform: scale(1);
     }
 
     #roomModalContent h3 {
@@ -1102,6 +1359,10 @@
       font-size: 18px;
       font-weight: 600;
       text-align: center;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     #modeToggle.multiplayer {
@@ -1151,6 +1412,70 @@
       margin-top: 12px;
     }
 
+    /* Forfeit Modal - Popup above game */
+    #forfeitModal,
+    #playAgainModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #forfeitModal.show,
+    #playAgainModal.show {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #forfeitModal .modal-content,
+    #playAgainModal .modal-content {
+      background: var(--glass-bg);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      max-width: 420px;
+      width: calc(100vw - 40px);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      box-sizing: border-box;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #forfeitModal.show .modal-content,
+    #playAgainModal.show .modal-content {
+      transform: scale(1);
+    }
+
+    #forfeitModal::before,
+    #playAgainModal::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #forfeitModal.show::before,
+    #playAgainModal.show::before {
+      opacity: 1;
+    }
+
     /* Confetti container */
     #confettiContainer {
       position: fixed;
@@ -1196,38 +1521,66 @@
     }
 
     button:not(.icon-button):not(.name-button) {
-      padding: 8px 18px;
+      padding: 10px 20px;
       border-radius: var(--radius-md);
       border: none;
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
       color: white;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
+      font-family: 'Inter', system-ui, sans-serif;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: var(--shadow-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 36px;
+      height: 40px;
       box-sizing: border-box;
+      letter-spacing: 0.01em;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:not(.icon-button):not(.name-button)::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    button:not(.icon-button):not(.name-button):active::before {
+      width: 300px;
+      height: 300px;
     }
 
     button:not(.icon-button):not(.name-button):hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
+      background: linear-gradient(135deg, var(--accent-hover), var(--accent));
+      transform: translateY(-2px);
       box-shadow: var(--shadow-lg);
     }
 
     button:not(.icon-button):not(.name-button):active {
-      transform: translateY(0);
+      transform: translateY(0) scale(0.98);
+      box-shadow: var(--shadow-md);
+    }
+
+    button:not(.icon-button):not(.name-button):focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
 
     #board-wrapper {
       background: var(--board-bg);
       padding: 4px 2px 4px 2px;
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-soft-inner);
+      box-shadow: var(--shadow-soft-inner), var(--shadow-md);
       width: fit-content;
       margin: 0 auto;
       max-width: 100%;
@@ -1258,12 +1611,13 @@
       cursor: pointer;
       font-size: 26px;
       font-weight: 700;
+      font-family: 'Inter', system-ui, sans-serif;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
       border-radius: var(--radius-md);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
       position: relative;
       overflow: hidden;
@@ -1283,9 +1637,10 @@
 
     .cell:hover {
       background: var(--cell-bg-hover);
-      transform: scale(1.02);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+      transform: scale(1.05);
+      box-shadow: var(--shadow-md);
       z-index: 1;
+      border-color: rgba(99, 102, 241, 0.2);
     }
 
     .cell:hover::after {
@@ -1318,10 +1673,21 @@
       font-weight: 700;
       opacity: 0.25;
       pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .cell.preview-X {
+      border-color: rgba(239, 68, 68, 0.4);
+      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2), 0 2px 4px rgba(239, 68, 68, 0.1);
     }
 
     .cell.preview-X::before {
       color: var(--x-color);
+    }
+
+    .cell.preview-O {
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 2px 4px rgba(59, 130, 246, 0.1);
     }
 
     .cell.preview-O::before {
@@ -1329,21 +1695,42 @@
     }
 
     .cell.win {
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      background: linear-gradient(135deg, #fef3c7, #fde68a, #fbbf24);
+      background-size: 200% 200%;
       box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.5);
       color: #92400e;
-      animation: pulseWin 1s ease-in-out infinite;
+      animation: pulseWin 1s ease-in-out infinite, gradientShiftWin 3s ease infinite;
+      position: relative;
+    }
+
+    .cell.win::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.4), transparent);
+      animation: glowOverlay 2s ease-in-out infinite;
     }
 
     @keyframes pulseWin {
       0%, 100% {
         transform: scale(1);
-        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.85), 0 5px 14px rgba(180, 83, 9, 0.6);
+        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.85), 0 5px 14px rgba(180, 83, 9, 0.6), 0 0 20px rgba(251, 191, 36, 0.4);
       }
       50% {
         transform: scale(1.05);
-        box-shadow: 0 0 0 3px rgba(217, 119, 6, 1), 0 7px 20px rgba(180, 83, 9, 0.8);
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 1), 0 7px 20px rgba(180, 83, 9, 0.8), 0 0 30px rgba(251, 191, 36, 0.6);
       }
+    }
+
+    @keyframes gradientShiftWin {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes glowOverlay {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
     }
 
     #contactLink {
@@ -1903,6 +2290,12 @@
         margin: 10px auto;
         padding: 12px;
       }
+
+      #forfeitModal .modal-content {
+        width: calc(100vw - 40px);
+        max-width: calc(100vw - 40px);
+        padding: 20px;
+      }
     }
   </style>
   
@@ -2157,6 +2550,33 @@
     </div>
   </div>
 
+  <!-- Forfeit Modal -->
+  <div id="forfeitModal">
+    <div class="modal-content">
+      <h3 style="margin-top: 0; margin-bottom: 16px;">⚠️ Game In Progress</h3>
+      <p id="forfeitModalMessage" style="margin-bottom: 20px; color: var(--text-secondary);">
+        You have an active game. Closing or refreshing the page will count as a forfeit (loss).
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="forfeitContinueBtn" class="button" style="background: var(--accent);">Continue Playing</button>
+        <button id="forfeitConfirmBtn" class="button" style="background: #dc2626;">Forfeit (Counts as Loss)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Play Again Modal (when computer goes first) -->
+  <div id="playAgainModal">
+    <div class="modal-content">
+      <h3 style="margin-top: 0; margin-bottom: 16px;">🎮 Play it again!</h3>
+      <p style="margin-bottom: 20px; color: var(--text-secondary);">
+        Computer goes first this round. Click "Start Game" when you're ready to play!
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="playAgainStartBtn" class="button" style="background: var(--accent);">Start Game</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Confetti Container -->
   <div id="confettiContainer"></div>
 
@@ -2261,6 +2681,12 @@
     const modeToggleSwitch = document.getElementById("modeToggleSwitch");
     const modeToggleSwitchMultiplayer = document.getElementById("modeToggleSwitchMultiplayer");
     const multiplayerScoreBar = document.getElementById("multiplayer-score-bar");
+    const forfeitModal = document.getElementById("forfeitModal");
+    const forfeitModalMessage = document.getElementById("forfeitModalMessage");
+    const forfeitContinueBtn = document.getElementById("forfeitContinueBtn");
+    const forfeitConfirmBtn = document.getElementById("forfeitConfirmBtn");
+    const playAgainModal = document.getElementById("playAgainModal");
+    const playAgainStartBtn = document.getElementById("playAgainStartBtn");
 
     let pendingName = "";
     let isLoginMode = false;
@@ -2441,6 +2867,7 @@
     let board;
     let currentPlayer;
     let gameOver;
+    let gameStarted = false; // Track if a game has been started
     let humanPlayer;
     let computerPlayer;
     let nextHumanPlayer = "X"; // alternates between X and O each game
@@ -2542,15 +2969,23 @@
     }
 
     function onCellClick(e) {
-      if (gameOver || computerThinking) return;
+      // Don't allow clicks if computer is thinking
+      if (computerThinking) return;
+      
+      // Allow clicks when game hasn't started (to start the game)
+      // Only block clicks if game has started AND (game is over OR computer is thinking)
+      if (gameStarted && gameOver) return;
       
       // Clear preview classes when clicking
       const cell = e.currentTarget;
       cell.classList.remove("preview-X", "preview-O");
       delete cell.dataset.preview;
 
-      // Only allow clicks when it's the human player's turn
-      if (currentPlayer !== humanPlayer) return;
+      // Allow clicks if:
+      // 1. Game has started and it's human's turn, OR
+      // 2. Game hasn't started yet but human goes first (currentPlayer === humanPlayer)
+      if (!gameStarted && currentPlayer !== humanPlayer) return;
+      if (gameStarted && currentPlayer !== humanPlayer) return;
       if (!hasHumanName()) return;
 
       const r = parseInt(cell.dataset.row, 10);
@@ -2560,6 +2995,13 @@
         return;
       }
 
+      // If game hasn't started yet and human goes first, start it now
+      if (!gameStarted && currentPlayer === humanPlayer) {
+        gameStarted = true;
+        updateRestartButtonText();
+        setStatusForTurn();
+      }
+
       handleMove(r, c, false);
     }
 
@@ -2567,8 +3009,16 @@
       const cell = e.currentTarget;
       const r = parseInt(cell.dataset.row, 10);
       const c = parseInt(cell.dataset.col, 10);
-      if (!board || board[r][c] !== "" || currentPlayer !== humanPlayer || gameOver || computerThinking || !hasHumanName()) return;
+      
+      // Allow preview if:
+      // 1. Game hasn't started yet AND human goes first (currentPlayer === humanPlayer), OR
+      // 2. Game has started AND it's human's turn AND game not over
+      const canPreview = (!gameStarted && currentPlayer === humanPlayer) || 
+                         (gameStarted && !gameOver && currentPlayer === humanPlayer);
+      
+      if (!board || board[r][c] !== "" || gameOver || !canPreview || computerThinking || !hasHumanName()) return;
       if (gameMode === "multiplayer" && currentPlayer !== humanPlayer) return;
+      
       const cls = humanPlayer === "X" ? "preview-X" : "preview-O";
       cell.classList.add(cls);
       cell.dataset.preview = humanPlayer;
@@ -2594,7 +3044,7 @@
     }
 
     async function handleMove(r, c, isComputer) {
-      if (gameOver) return;
+      if (gameOver || !gameStarted) return;
       
       // In multiplayer mode, only allow moves for current player
       if (gameMode === "multiplayer" && !isComputer) {
@@ -2720,6 +3170,7 @@
           shareGameResultBtn.classList.add("visible");
           computerThinking = false;
           resetGameState();
+          clearGameState(); // Clear saved game state when game ends
         }
         return;
       }
@@ -2745,6 +3196,7 @@
           shareGameResultBtn.classList.add("visible");
           computerThinking = false;
           resetGameState();
+          clearGameState(); // Clear saved game state when game ends
         }
         return;
       }
@@ -2774,6 +3226,9 @@
         }
         computerMoveTimeoutId = setTimeout(computerMove, 1000);
       }
+      
+      // Save game state after move (for forfeit detection on refresh)
+      saveGameState();
     }
 
     async function syncMoveToFirestore(r, c) {
@@ -2796,6 +3251,12 @@
 
     function computerMove() {
       if (gameOver) {
+        computerThinking = false;
+        return;
+      }
+
+      // Don't let computer move if game hasn't started yet (waiting for player confirmation)
+      if (!gameStarted) {
         computerThinking = false;
         return;
       }
@@ -2960,6 +3421,201 @@
       };
     }
 
+    // ---- Game State Persistence (for forfeit detection) ----
+    
+    function saveGameState() {
+      // Only save in training mode and if game is not over
+      if (gameMode !== "training" || gameOver) {
+        clearGameState();
+        return;
+      }
+      
+      // Don't save if board is not initialized or empty (no moves made yet)
+      if (!board || !Array.isArray(board)) {
+        clearGameState();
+        return;
+      }
+      
+      const hasMoves = board.some(row => row.some(cell => cell !== ""));
+      if (!hasMoves) {
+        clearGameState();
+        return;
+      }
+      
+      try {
+        const gameStateToSave = {
+          board: board,
+          currentPlayer: currentPlayer,
+          gameOver: gameOver,
+          humanPlayer: humanPlayer,
+          computerPlayer: computerPlayer,
+          gameState: gameState,
+          playerName: currentPlayerName || humanNameInput.value.trim()
+        };
+        localStorage.setItem("tictac9x9_activeGame", JSON.stringify(gameStateToSave));
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+    
+    function loadGameState() {
+      try {
+        const saved = localStorage.getItem("tictac9x9_activeGame");
+        if (!saved) return null;
+        const data = JSON.parse(saved);
+        
+        // Validate saved data
+        if (!data.board || !Array.isArray(data.board) || 
+            !data.currentPlayer || !data.humanPlayer || !data.computerPlayer) {
+          return null;
+        }
+        
+        return data;
+      } catch (e) {
+        return null;
+      }
+    }
+    
+    function clearGameState() {
+      try {
+        localStorage.removeItem("tictac9x9_activeGame");
+      } catch (e) {
+        // ignore errors
+      }
+    }
+    
+    function restoreGameState(savedState) {
+      if (!savedState) return false;
+      
+      board = savedState.board;
+      currentPlayer = savedState.currentPlayer;
+      gameOver = savedState.gameOver || false;
+      humanPlayer = savedState.humanPlayer;
+      computerPlayer = savedState.computerPlayer;
+      gameStarted = true; // Game was started if we're restoring state
+      gameState = savedState.gameState || {
+        moveCount: 0,
+        blocksThisGame: 0,
+        opponentMaxInRow: 0,
+        opponentHad4InRow: false,
+        playerHad4InRow: false
+      };
+      
+      // Restore UI
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+          if (cell) {
+            cell.textContent = board[r][c] || "";
+            cell.classList.remove("X", "O", "last-move", "win");
+            if (board[r][c]) {
+              cell.classList.add(board[r][c]);
+            }
+          }
+        }
+      }
+      
+      // Update button text since game is started
+      updateRestartButtonText();
+      
+      // Update status
+      if (gameOver) {
+        statusElem.textContent = "Game over";
+        statusRow.className = "status-neutral";
+      } else {
+        setStatusForTurn();
+        // If it's computer's turn, trigger computer move
+        if (currentPlayer === computerPlayer && !gameOver) {
+          computerThinking = true;
+          if (computerMoveTimeoutId !== null) {
+            clearTimeout(computerMoveTimeoutId);
+          }
+          computerMoveTimeoutId = setTimeout(computerMove, 1000);
+        }
+      }
+      
+      return true;
+    }
+    
+    async function handleForfeit() {
+      // Count forfeit as loss
+      currentPlayerStats.gamesPlayed++;
+      currentPlayerStats.losses++;
+      globalStats.gamesPlayed++;
+      globalStats.losses++;
+
+      // Reset streak
+      currentStreak = 0;
+
+      // Update status
+      setStatusWithMark(getComputerDisplayName(), computerPlayer, " wins! (Forfeit)");
+      statusRow.className = "status-neutral";
+      playSound("aw");
+
+      // Save stats
+      await saveStats();
+
+      // Update displays
+      if (gameMode === "training") {
+        updateStreakDisplays();
+      }
+      updateStatsDisplay();
+
+      // Clear saved game state
+      clearGameState();
+      
+      // Reset game started flag
+      gameStarted = false;
+      updateRestartButtonText();
+
+      // Don't automatically start new round here - let the caller decide
+      // (for restart action, we'll start new round after forfeit)
+    }
+    
+    function showForfeitModal(action = "") {
+      // Set message based on action
+      if (action === "restart") {
+        forfeitModalMessage.textContent = "You have an active game. Restarting will count as a forfeit (loss).";
+      } else {
+        forfeitModalMessage.textContent = "You have an active game. Closing or refreshing the page will count as a forfeit (loss).";
+      }
+      forfeitModal.dataset.action = action;
+      forfeitModal.classList.add("show");
+    }
+    
+    function hideForfeitModal() {
+      forfeitModal.classList.remove("show");
+    }
+
+    function showPlayAgainModal() {
+      playAgainModal.classList.add("show");
+    }
+    
+    function hidePlayAgainModal() {
+      playAgainModal.classList.remove("show");
+    }
+
+    function startGameWithComputerFirst() {
+      // Hide the modal
+      hidePlayAgainModal();
+      
+      // Start the game
+      gameStarted = true;
+      updateRestartButtonText();
+      
+      // Update status
+      setStatusForTurn();
+      
+      // Trigger computer's first move after a short delay
+      if (currentPlayer === computerPlayer && !gameOver) {
+        computerThinking = true;
+        if (computerMoveTimeoutId !== null) {
+          clearTimeout(computerMoveTimeoutId);
+        }
+        computerMoveTimeoutId = setTimeout(computerMove, 1000);
+      }
+    }
+
     // ---- Sound Effects ----
 
     function playSound(type) {
@@ -3111,7 +3767,8 @@
             losses: data.losses || 0,
             draws: data.draws || 0
           };
-          currentStreak = data.currentStreak || 0;
+          // Don't restore currentStreak - it resets on page refresh
+          // currentStreak is always reset to 0 in init()
           return true;
         }
       } catch (error) {
@@ -3343,7 +4000,7 @@
       }
 
       // Centurion
-      if (!achievements.centurion.unlocked && globalStats.gamesPlayed >= 100) {
+      if (!achievements.centurion.unlocked && currentPlayerStats.gamesPlayed >= 100) {
         achievements.centurion.unlocked = true;
         newlyUnlocked.push(achievements.centurion);
       }
@@ -3693,12 +4350,50 @@
       return score;
     }
 
+    function updateRestartButtonText() {
+      if (!gameStarted) {
+        restartBtn.textContent = "Start Game";
+        restartBtn.title = "Start game (R or Space)";
+      } else {
+        restartBtn.textContent = "Restart game";
+        restartBtn.title = "Restart game (R or Space)";
+      }
+    }
+
     function restartGame() {
       if (gameMode === "multiplayer" && currentRoomId) {
         alert("Cannot restart in multiplayer mode. Please leave the room first.");
         return;
       }
+      
+      // Hide play again modal if it's showing (in case it was somehow shown)
+      hidePlayAgainModal();
+      
+      // Check if there's an active game that hasn't ended
+      // An active game means: game has started, not over, and has moves on the board
+      const hasMovesOnBoard = board.some(row => row.some(cell => cell !== ""));
+      const hasActiveGame = !gameOver && gameStarted && hasMovesOnBoard;
+      
+      if (hasActiveGame) {
+        // Show forfeit modal for restart
+        showForfeitModal("restart");
+        return;
+      }
+      
+      // No active game - proceed with restart/start
       startNewRound();
+      
+      // If computer goes first, start the game immediately
+      if (currentPlayer === computerPlayer && !gameOver && hasHumanName()) {
+        gameStarted = true;
+        updateRestartButtonText();
+        setStatusForTurn();
+        // Trigger computer's first move
+        if (computerMoveTimeoutId !== null) {
+          clearTimeout(computerMoveTimeoutId);
+        }
+        computerMoveTimeoutId = setTimeout(computerMove, 1000);
+      }
     }
 
     function setStatusForTurn() {
@@ -4598,6 +5293,8 @@
     });
 
     document.addEventListener("keydown", (e) => {
+      
+      // Normal restart shortcuts
       if (e.key === "r" || e.key === "R" || e.key === " ") {
         const active = document.activeElement;
         if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) return;
@@ -4695,8 +5392,9 @@
       // Update status and potentially start/continue game
       setStatusForTurn();
       
-      // If it's computer's turn and name was just set, trigger computer move
-      if (currentPlayer === computerPlayer && !gameOver) {
+      // If it's computer's turn and game has started, trigger computer move
+      // (Don't trigger if game hasn't started yet - wait for player confirmation)
+      if (gameStarted && currentPlayer === computerPlayer && !gameOver) {
         computerThinking = true;
         if (computerMoveTimeoutId !== null) {
           clearTimeout(computerMoveTimeoutId);
@@ -4723,9 +5421,7 @@
           hideRegisterModal();
           await completeNameSetup(nameToUse, true); // Force load stats on login
           updateStatsDisplay(); // Update stats display after loading
-          if (!gameOver && board.every(row => row.every(cell => cell === ""))) {
-            startNewRound();
-          }
+          // Don't auto-start game - user must click "Start Game" button
         } else {
           alert("Incorrect password. Please try again.");
           registerPassword.value = "";
@@ -4769,9 +5465,7 @@
       
       hideRegisterModal();
       await completeNameSetup(nameToUse);
-      if (!gameOver && board.every(row => row.every(cell => cell === ""))) {
-        startNewRound();
-      }
+      // Don't auto-start game - user must click "Start Game" button
     });
     registerModal.addEventListener("click", (e) => {
       if (e.target === registerModal) hideRegisterModal();
@@ -4904,8 +5598,13 @@
 
       board = createEmptyBoard();
       gameOver = false;
+      gameStarted = false; // Don't mark as started yet - wait for first move or user confirmation
       computerThinking = false;
       resetGameState();
+      clearGameState(); // Clear saved game state when starting new round
+      
+      // Update button text
+      updateRestartButtonText();
 
       // Alternate which mark the human controls each game
       humanPlayer = nextHumanPlayer;
@@ -4925,16 +5624,19 @@
         updateMultiplayerScoreDisplay();
       }
 
-      // Prepare status and possibly trigger computer's opening move
+      // Prepare status - game hasn't started yet
       if (!hasHumanName()) {
         statusElem.textContent = "Enter your name above to start playing";
         statusRow.className = "status-neutral";
       } else if (currentPlayer === humanPlayer) {
-        setStatusForTurn();
+        // Human goes first - can click on board to start
+        const name = getHumanDisplayName();
+        setStatusWithMark(name, currentPlayer, " – click on a square to start");
+        statusRow.className = "status-your-turn";
       } else {
-        setStatusForTurn();
-        computerThinking = true;
-        computerMoveTimeoutId = setTimeout(computerMove, 1000);
+        // Computer goes first - ready to start when user clicks "Start Game"
+        statusElem.textContent = "Computer goes first - click 'Start Game' to begin";
+        statusRow.className = "status-neutral";
       }
 
       // Flip for next game
@@ -4942,6 +5644,9 @@
     }
 
     async function init() {
+      // Reset current streak on page refresh
+      currentStreak = 0;
+      
       // Set initial state before any rendering
       gameMode = "training"; // Default to training mode
       // Don't load saved mode - always start with training
@@ -5010,13 +5715,106 @@
         updateStreakDisplays();
       }
       
-      // Show name selection modal if no name is set
+      // Clear any stale game state on init (forfeit modal will show on beforeunload if needed)
+      clearGameState();
+      
+      // Initialize game state but don't start automatically
+      gameStarted = false;
+      gameOver = true; // Set to true so no moves can be made until game starts
+      board = createEmptyBoard();
+      updateRestartButtonText();
+      
+      // Clear board display
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.classList.remove("X", "O", "last-move", "win");
+      });
+      
+      // Set initial status and prepare game
       if (!currentPlayerName) {
+        statusElem.textContent = "Enter your name above to start playing";
+        statusRow.className = "status-neutral";
         showNameSelectionModal();
       } else {
+        // Name exists - prepare the game so player can click to start
         startNewRound();
       }
     }
+    
+    // Forfeit modal handlers
+    forfeitContinueBtn.addEventListener("click", () => {
+      hideForfeitModal();
+      isNavigatingAway = false;
+      const action = forfeitModal.dataset.action || "";
+      delete forfeitModal.dataset.action;
+      
+      const savedGameState = loadGameState();
+      if (savedGameState) {
+        restoreGameState(savedGameState);
+        // Continue saving game state
+        saveGameState();
+      } else if (action === "restart") {
+        // If it was a restart action but no saved state, just continue current game
+        // (shouldn't happen, but handle it gracefully)
+      } else {
+        startNewRound();
+      }
+    });
+    
+    forfeitConfirmBtn.addEventListener("click", async () => {
+      hideForfeitModal();
+      isNavigatingAway = false;
+      const action = forfeitModal.dataset.action || "";
+      delete forfeitModal.dataset.action;
+      
+      await handleForfeit();
+      
+      // If it was a restart action, start a new game after forfeit
+      if (action === "restart") {
+        startNewRound();
+      }
+      // Otherwise, allow page to refresh/close naturally
+    });
+    
+    forfeitModal.addEventListener("click", (e) => {
+      if (e.target === forfeitModal) {
+        // Don't allow closing by clicking outside - user must choose
+      }
+    });
+
+    // Play Again Modal handlers
+    // Play again modal removed - game starts directly when "Start Game" is clicked
+
+    // Handle page close/refresh - show forfeit modal if game is active
+    let isNavigatingAway = false;
+    
+    window.addEventListener("beforeunload", (e) => {
+      // Only trigger forfeit if game has actually started (not just prepared)
+      const savedGameState = loadGameState();
+      const hasMovesOnBoard = board.some(row => row.some(cell => cell !== ""));
+      if (savedGameState && savedGameState.playerName && 
+          savedGameState.playerName.toLowerCase() === (currentPlayerName || "").toLowerCase() &&
+          !gameOver && gameStarted && hasMovesOnBoard) {
+        // Show the forfeit modal immediately
+        showForfeitModal();
+        isNavigatingAway = true;
+        
+        // Trigger browser's confirmation dialog
+        e.preventDefault();
+        e.returnValue = ""; // Required for Chrome
+        return ""; // Required for other browsers
+      }
+    });
+
+    // Handle visibility change - hide modal if user cancels navigation
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && isNavigatingAway) {
+        // User cancelled navigation - hide modal and reset flag
+        hideForfeitModal();
+        isNavigatingAway = false;
+      }
+    });
 
     // Leaderboard functions
     async function loadLeaderboard() {
