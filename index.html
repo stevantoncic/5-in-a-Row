@@ -12,6 +12,16 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="5-in-a-Row - Challenge the AI!" />
   <meta name="twitter:description" content="Play 5-in-a-Row against a challenging AI. Unlock achievements and compete for the global best streak!" />
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L08B3D4HTZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-L08B3D4HTZ');
+  </script>
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     
@@ -833,6 +843,38 @@
       margin-bottom: 6px;
       flex-wrap: wrap;
       align-items: center;
+    }
+
+    #restartBtn.forfeit-button {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      border-color: #991b1b;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    #restartBtn.forfeit-button:hover {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border-color: #b91c1c;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    #restartBtn.forfeit-button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] #restartBtn.forfeit-button {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.9), rgba(185, 28, 28, 0.85));
+      border-color: rgba(153, 27, 27, 0.6);
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] #restartBtn.forfeit-button:hover {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.9));
+      border-color: rgba(185, 28, 28, 0.8);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
 
     .icon-button {
@@ -1772,7 +1814,8 @@
     #forfeitModal,
     #playAgainModal,
     #setCompleteModal,
-    #matchResultModal {
+    #matchResultModal,
+    #rematchDeclineResultModal {
       display: none;
       position: fixed;
       top: 0;
@@ -1792,7 +1835,8 @@
     #forfeitModal.show,
     #playAgainModal.show,
     #setCompleteModal.show,
-    #matchResultModal.show {
+    #matchResultModal.show,
+    #rematchDeclineResultModal.show {
       display: flex;
       opacity: 1;
     }
@@ -1800,7 +1844,8 @@
     #forfeitModal .modal-content,
     #playAgainModal .modal-content,
     #setCompleteModal .modal-content,
-    #matchResultModal .modal-content {
+    #matchResultModal .modal-content,
+    #rematchDeclineResultModal .modal-content {
       background: var(--glass-bg);
       border-radius: var(--radius-xl);
       padding: 28px;
@@ -1820,7 +1865,8 @@
     #forfeitModal.show .modal-content,
     #playAgainModal.show .modal-content,
     #setCompleteModal.show .modal-content,
-    #matchResultModal.show .modal-content {
+    #matchResultModal.show .modal-content,
+    #rematchDeclineResultModal.show .modal-content {
       transform: scale(1);
     }
 
@@ -2585,7 +2631,7 @@
       }
 
       #board-wrapper {
-        padding: 5px 3px 5px 3px;
+        padding: 6px;
       }
 
       #board {
@@ -2979,10 +3025,38 @@
     </div>
   </div>
 
+  <!-- Rematch Decline/Forfeit Result Modal -->
+  <div id="rematchDeclineResultModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <h3 id="rematchDeclineResultTitle" style="margin-top: 0; margin-bottom: 16px; font-size: 24px; font-weight: 700;"></h3>
+      <div id="rematchDeclineResultDetails" style="margin-bottom: 20px; color: var(--text-secondary); font-size: 14px; line-height: 1.6;"></div>
+      <div id="rematchDeclineResultScore" style="margin-bottom: 20px; padding: 16px; background: var(--cell-bg); border-radius: var(--radius-md); border: 1px solid var(--input-border);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span id="rematchDeclinePlayer1Name"></span>
+          <span id="rematchDeclinePlayer1Score" style="font-weight: 700; color: var(--accent);"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span id="rematchDeclinePlayer2Name"></span>
+          <span id="rematchDeclinePlayer2Score" style="font-weight: 700; color: var(--accent);"></span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="rematchDeclineBackBtn" class="button" style="background: var(--accent); width: 100%;">Back to Multiplayer</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Confetti Container -->
   <div id="confettiContainer"></div>
 
   <script>
+    // Google Analytics helper function
+    function trackEvent(eventName, eventParams = {}) {
+      if (typeof gtag !== 'undefined') {
+        gtag('event', eventName, eventParams);
+      }
+    }
+    
     const BOARD_SIZE = 9;
     const WIN_LENGTH = 5;
 
@@ -3103,6 +3177,14 @@
     const rematchStatusText = document.getElementById("rematchStatusText");
     const matchResultRematchBtn = document.getElementById("matchResultRematchBtn");
     const matchResultDeclineBtn = document.getElementById("matchResultDeclineBtn");
+    const rematchDeclineResultModal = document.getElementById("rematchDeclineResultModal");
+    const rematchDeclineResultTitle = document.getElementById("rematchDeclineResultTitle");
+    const rematchDeclineResultDetails = document.getElementById("rematchDeclineResultDetails");
+    const rematchDeclinePlayer1Name = document.getElementById("rematchDeclinePlayer1Name");
+    const rematchDeclinePlayer1Score = document.getElementById("rematchDeclinePlayer1Score");
+    const rematchDeclinePlayer2Name = document.getElementById("rematchDeclinePlayer2Name");
+    const rematchDeclinePlayer2Score = document.getElementById("rematchDeclinePlayer2Score");
+    const rematchDeclineBackBtn = document.getElementById("rematchDeclineBackBtn");
 
     let pendingName = "";
     let isLoginMode = false;
@@ -3590,6 +3672,11 @@
             lastGameResultText = `I just lost in 5-in-a-Row. My streak was ${currentStreak}. Can you do better?`;
             currentStreak = 0;
             playSound("aw");
+            // Track training mode loss
+            trackEvent('game_complete', {
+              'game_mode': 'training',
+              'result': 'loss'
+            });
           } else {
             const winnerName = getHumanDisplayName();
             setStatusWithMark(winnerName, currentPlayer, " wins!");
@@ -3604,6 +3691,13 @@
             createConfetti();
             lastGameResultText = `I just won in 5-in-a-Row! Streak: ${currentStreak}. Try to beat me!`;
             checkWinAchievements();
+            // Track training mode win
+            trackEvent('game_complete', {
+              'game_mode': 'training',
+              'result': 'win',
+              'streak': currentStreak,
+              'best_streak': bestStreak
+            });
           }
           checkAchievements();
           if (gameMode === "training") {
@@ -3634,6 +3728,11 @@
           computerThinking = false;
           resetGameState();
           clearGameState(); // Clear saved game state when game ends
+          // Track training mode draw
+          trackEvent('game_complete', {
+            'game_mode': 'training',
+            'result': 'draw'
+          });
         }
         return;
       }
@@ -3975,6 +4074,26 @@
     }
     
     async function handleForfeit() {
+      // Check if this is a multiplayer forfeit
+      if (gameMode === "multiplayer" && currentRoomId && firebaseInitialized && db) {
+        try {
+          const roomRef = db.collection("gameRooms").doc(currentRoomId);
+          const roomDoc = await roomRef.get();
+          if (roomDoc.exists) {
+            const roomData = roomDoc.data();
+            const totalGames = (roomData.matchResults?.player1Wins || 0) + (roomData.matchResults?.player2Wins || 0) + (roomData.matchResults?.draws || 0);
+            const matchFinished = roomData.gameOver && totalGames >= 2;
+            // If match is not finished and both players are present, handle as multiplayer forfeit
+            if (!matchFinished && roomData.player1 && roomData.player2) {
+              await handleMultiplayerForfeit();
+              return;
+            }
+          }
+        } catch (error) {
+          console.error("Error checking room state in handleForfeit:", error);
+        }
+      }
+
       // Reset streak
       currentStreak = 0;
 
@@ -3998,11 +4117,93 @@
       // Don't automatically start new round here - let the caller decide
       // (for restart action, we'll start new round after forfeit)
     }
+
+    async function handleMultiplayerForfeit() {
+      if (!currentRoomId || !firebaseInitialized || !db) return;
+
+      try {
+        const roomRef = db.collection("gameRooms").doc(currentRoomId);
+        const roomDoc = await roomRef.get();
+        if (!roomDoc.exists) return;
+
+        const roomData = roomDoc.data();
+        let updatedMatchResults = { ...matchResults };
+
+        // Award 2 wins (4 points) to the opponent
+        if (isPlayer1) {
+          updatedMatchResults.player2Wins += 2;
+        } else {
+          updatedMatchResults.player1Wins += 2;
+        }
+
+        matchResults = updatedMatchResults;
+        updateMultiplayerScoreDisplay();
+
+        // Update Firestore with forfeit result
+        await roomRef.update({
+          board: boardToFirestore(board),
+          gameOver: true,
+          winner: isPlayer1 ? "O" : "X", // Opponent wins
+          matchResults: updatedMatchResults,
+          forfeit: true,
+          forfeitedBy: isPlayer1 ? "player1" : "player2",
+          lastMove: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Update status
+        setStatusWithMark(opponentName, isPlayer1 ? "O" : "X", " wins! (Forfeit)");
+        statusRow.className = "status-neutral";
+        playSound("aw");
+
+        // Check if match is complete (2 games played)
+        const totalGames = updatedMatchResults.player1Wins + updatedMatchResults.player2Wins + updatedMatchResults.draws;
+        
+        // Complete the match by awarding remaining wins if needed
+        const remainingWinsNeeded = 2 - (updatedMatchResults.player1Wins + updatedMatchResults.player2Wins);
+        if (remainingWinsNeeded > 0) {
+          if (isPlayer1) {
+            updatedMatchResults.player2Wins += remainingWinsNeeded;
+          } else {
+            updatedMatchResults.player1Wins += remainingWinsNeeded;
+          }
+          matchResults = updatedMatchResults;
+          await roomRef.update({ matchResults: updatedMatchResults });
+        }
+        
+        // Calculate final scores and update leaderboard
+        const player1Name = roomData.player1?.name || "";
+        const player2Name = roomData.player2?.name || "";
+        const scores = calculateMatchScore(updatedMatchResults.player1Wins, updatedMatchResults.draws, updatedMatchResults.player2Wins);
+        await updateLeaderboard(player1Name, player2Name, scores, updatedMatchResults);
+        
+        // Show forfeit result modal (we forfeited, so we lost)
+        showForfeitResultModal(player1Name, player2Name, true);
+
+        gameOver = true;
+        gameStarted = false;
+        resetGameState();
+        clearGameState();
+        updateRestartButtonText();
+        // Track forfeit
+        trackEvent('multiplayer_forfeit', {
+          'forfeited_by': 'me',
+          'opponent_received_points': 4
+        });
+      } catch (error) {
+        console.error("Error handling multiplayer forfeit:", error);
+      }
+    }
     
     function showForfeitModal(action = "") {
       // Set message based on action
       if (action === "restart") {
         forfeitModalMessage.textContent = "You have an active game. Restarting will count as a forfeit (loss).";
+      } else if (action === "forfeit-button") {
+        forfeitModalMessage.textContent = "You are about to forfeit the match. Your opponent will receive 4 points. Are you sure?";
+      } else if (action === "leave-room" || (action === "" && gameMode === "multiplayer")) {
+        forfeitModalMessage.textContent = "You have an active multiplayer game. Leaving will forfeit the match and award 4 points to your opponent.";
+      } else if (action === "switch-mode" && gameMode === "multiplayer") {
+        forfeitModalMessage.textContent = "You have an active multiplayer game. Switching to training mode will forfeit the match and award 4 points to your opponent.";
       } else {
         forfeitModalMessage.textContent = "You have an active game. Closing or refreshing the page will count as a forfeit (loss).";
       }
@@ -4230,6 +4431,11 @@
       // Show notifications for newly unlocked achievements
       newlyUnlocked.forEach(achievement => {
         showAchievementNotification(achievement);
+        // Track achievement unlock
+        trackEvent('achievement_unlocked', {
+          'achievement_id': achievement.id,
+          'achievement_name': achievement.name
+        });
       });
 
       if (newlyUnlocked.length > 0) {
@@ -4261,6 +4467,11 @@
 
       newlyUnlocked.forEach(achievement => {
         showAchievementNotification(achievement);
+        // Track achievement unlock
+        trackEvent('achievement_unlocked', {
+          'achievement_id': achievement.id,
+          'achievement_name': achievement.name
+        });
       });
 
       if (newlyUnlocked.length > 0) {
@@ -4551,6 +4762,11 @@
       const leaderboardModal = document.getElementById("leaderboardModal");
       const leaderboardContent = document.getElementById("leaderboardContent");
       if (!leaderboardModal || !leaderboardContent) return;
+      
+      // Track leaderboard view
+      trackEvent('leaderboard_viewed', {
+        'total_players': leaderboard.length
+      });
 
       if (leaderboard.length === 0) {
         leaderboardContent.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">No multiplayer matches yet. Play a match to appear here!</div>';
@@ -4676,16 +4892,31 @@
     }
 
     function updateRestartButtonText() {
-      if (!gameStarted) {
-        restartBtn.textContent = "Start Game";
-        restartBtn.title = "Start game (R or Space)";
+      // In multiplayer mode with active game, show "Forfeit" button
+      if (gameMode === "multiplayer" && currentRoomId && gameStarted && !gameOver) {
+        restartBtn.textContent = "Forfeit";
+        restartBtn.title = "Forfeit match (opponent gets 4 points)";
+        restartBtn.classList.add("forfeit-button");
       } else {
-        restartBtn.textContent = "Restart game";
-        restartBtn.title = "Restart game (R or Space)";
+        restartBtn.classList.remove("forfeit-button");
+        if (!gameStarted) {
+          restartBtn.textContent = "Start Game";
+          restartBtn.title = "Start game (R or Space)";
+        } else {
+          restartBtn.textContent = "Restart game";
+          restartBtn.title = "Restart game (R or Space)";
+        }
       }
     }
 
     function restartGame() {
+      // In multiplayer mode with active game, handle as forfeit
+      if (gameMode === "multiplayer" && currentRoomId && gameStarted && !gameOver) {
+        // Show forfeit modal
+        showForfeitModal("forfeit-button");
+        return;
+      }
+      
       if (gameMode === "multiplayer" && currentRoomId) {
         alert("Cannot restart in multiplayer mode. Please leave the room first.");
         return;
@@ -4907,7 +5138,7 @@
 
     let isToggling = false; // Prevent double-firing
     
-    function toggleGameMode() {
+    async function toggleGameMode() {
       if (isToggling) {
         console.log("Toggle already in progress, ignoring duplicate call");
         return;
@@ -4928,16 +5159,46 @@
           gameMode = "multiplayer";
           saveGameMode();
           updateModeToggle();
+          // Track mode switch
+          trackEvent('mode_switch', {
+            'from': 'training',
+            'to': 'multiplayer'
+          });
           showRoomModal();
         } else {
-          // Switching to training - leave room if in one
+          // Switching to training - check if we need to forfeit first
+          if (currentRoomId && gameMode === "multiplayer" && firebaseInitialized && db) {
+            try {
+              const roomRef = db.collection("gameRooms").doc(currentRoomId);
+              const roomDoc = await roomRef.get();
+              if (roomDoc.exists) {
+                const roomData = roomDoc.data();
+                const totalGames = (roomData.matchResults?.player1Wins || 0) + (roomData.matchResults?.player2Wins || 0) + (roomData.matchResults?.draws || 0);
+                const matchFinished = roomData.gameOver && totalGames >= 2;
+                // If match is not finished and both players are present, show forfeit modal
+                if (!matchFinished && roomData.player1 && roomData.player2) {
+                  showForfeitModal("switch-mode");
+                  isToggling = false; // Reset flag since we're not switching yet
+                  return; // Don't switch yet - wait for user confirmation
+                }
+              }
+            } catch (error) {
+              console.error("Error checking room state before mode switch:", error);
+            }
+          }
+          // No active match or match finished - safe to switch
           if (currentRoomId) {
-            leaveRoom();
+            await leaveRoom();
           }
           console.log("Switching to training mode");
           gameMode = "training";
           saveGameMode();
           updateModeToggle();
+          // Track mode switch
+          trackEvent('mode_switch', {
+            'from': 'multiplayer',
+            'to': 'training'
+          });
           // Use startNewRound instead of restartGame to prevent auto-starting computer
           startNewRound();
         }
@@ -5015,6 +5276,13 @@
       roomModal.classList.remove("show");
       // Only return to training when user explicitly closes (not when both players join)
       if (switchToTraining && gameMode === "multiplayer") {
+        // Check if there's an active game - prevent leaving without forfeiting
+        const hasActiveGame = gameStarted && !gameOver && currentRoomId;
+        if (hasActiveGame) {
+          // Show forfeit modal for multiplayer
+          showForfeitModal("leave-room");
+          return; // Don't leave yet - wait for user confirmation
+        }
         await leaveRoom();
         gameMode = "training";
         saveGameMode();
@@ -5126,6 +5394,11 @@
         setupRoomListener(roomId);
         console.log("Room created successfully:", roomId);
         console.log("Room ID to share:", roomId);
+        // Track room creation
+        trackEvent('multiplayer_room_created', {
+          'room_id': roomId,
+          'match_type': matchType
+        });
       } catch (error) {
         console.error("Error creating room:", error);
         console.error("Error details:", error.message, error.stack);
@@ -5203,6 +5476,10 @@
 
         hideRoomModal(false); // Don't switch to training - game is starting
         setupRoomListener(roomId);
+        // Track room join
+        trackEvent('multiplayer_room_joined', {
+          'room_id': roomId
+        });
       } catch (error) {
         console.error("Error joining room:", error);
         alert("Failed to join room. Please try again.");
@@ -5484,20 +5761,78 @@
       roomListener = db.collection("gameRooms").doc(roomId).onSnapshot(
         async (doc) => {
           if (!doc.exists) {
-            // Room was deleted
+            // Room was deleted - silently handle it
             if (currentRoomId === roomId) {
-              // Don't alert if we're in rematch decline flow (expected - both left)
-              const inDeclineFlow = matchResultModal?.classList.contains("show") &&
-                rematchStatusText?.textContent?.includes("Opponent declined");
-              if (!inDeclineFlow) {
-                alert("Room was closed.");
+              // Only leave room if not showing rematch decline modal or forfeit result modal (user will click "Back to Multiplayer")
+              const showingRematchDeclineModal = rematchDeclineResultModal?.classList.contains("show");
+              const showingForfeitModal = forfeitModal?.classList.contains("show");
+              if (!showingRematchDeclineModal && !showingForfeitModal) {
+                leaveRoom();
               }
-              leaveRoom();
             }
             return;
           }
 
           const roomData = doc.data();
+          
+          // Check for forfeit - opponent has forfeited
+          // Use local flag to prevent duplicate modal display
+          const forfeitKey = `forfeitShown_${roomId}_${roomData.forfeitedBy}`;
+          const alreadyShownForfeit = sessionStorage.getItem(forfeitKey) === "true";
+          
+          if (roomData.forfeit === true && roomData.forfeitedBy && 
+              ((isPlayer1 && roomData.forfeitedBy === "player2") || 
+               (!isPlayer1 && roomData.forfeitedBy === "player1")) &&
+              !alreadyShownForfeit) {
+            // Mark as shown locally to prevent duplicate handling
+            sessionStorage.setItem(forfeitKey, "true");
+            
+            // Opponent has forfeited - we win!
+            const totalGames = (roomData.matchResults?.player1Wins || 0) + 
+                              (roomData.matchResults?.player2Wins || 0) + 
+                              (roomData.matchResults?.draws || 0);
+            const matchFinished = roomData.gameOver && totalGames >= 2;
+            
+            // Update local match results to reflect forfeit (opponent gets 0, we get 4 points)
+            let updatedMatchResults = { ...(roomData.matchResults || { player1Wins: 0, draws: 0, player2Wins: 0 }) };
+            if (isPlayer1) {
+              updatedMatchResults.player1Wins = 2; // We get 2 wins (4 points)
+              updatedMatchResults.player2Wins = 0;
+            } else {
+              updatedMatchResults.player2Wins = 2; // We get 2 wins (4 points)
+              updatedMatchResults.player1Wins = 0;
+            }
+            matchResults = updatedMatchResults;
+            updateMultiplayerScoreDisplay();
+            
+            // Update game state
+            gameOver = true;
+            gameStarted = false;
+            
+            // Show win notification
+            setStatusWithMark("You", "", " win! Opponent forfeited.");
+            statusRow.className = "status-neutral";
+            playSound("applause");
+            createConfetti();
+            
+            // Update leaderboard
+            const player1Name = roomData.player1?.name || "";
+            const player2Name = roomData.player2?.name || "";
+            const scores = calculateMatchScore(updatedMatchResults.player1Wins, updatedMatchResults.draws, updatedMatchResults.player2Wins);
+            await updateLeaderboard(player1Name, player2Name, scores, updatedMatchResults);
+            
+            // Hide any other modals that might be showing
+            matchResultModal.classList.remove("show");
+            
+            // Show forfeit result modal (opponent forfeited, so we won)
+            showForfeitResultModal(player1Name, player2Name, false);
+            
+            // Track opponent forfeit (we won)
+            trackEvent('multiplayer_forfeit', {
+              'forfeited_by': 'opponent',
+              'i_received_points': 4
+            });
+          }
           
           // Update UI
           if (roomData.player1) {
@@ -5637,8 +5972,8 @@
               }, 1000);
             }
             
-            // If match is complete and modal hasn't been shown yet, show it
-            if (totalGames >= 2 && roomData.gameOver && !matchResultModal.classList.contains("show")) {
+            // If match is complete and modal hasn't been shown yet, show it (unless there was a forfeit)
+            if (totalGames >= 2 && roomData.gameOver && !matchResultModal.classList.contains("show") && !roomData.forfeit) {
               // Match is complete - show modal to this player (if not already processed)
               const scores = calculateMatchScore(
                 roomData.matchResults.player1Wins || 0,
@@ -5697,14 +6032,20 @@
             // Update rematch status in modal if it's visible
             if (matchResultModal && matchResultModal.classList.contains("show")) {
               if (p1Declined || p2Declined) {
-                rematchStatus.style.display = "block";
-                rematchStatusText.textContent = "Opponent declined rematch. Returning to room selection...";
-                setTimeout(() => {
-                  matchResultModal.classList.remove("show");
-                  leaveRoom();
-                  // Keep multiplayer mode so they can create/join a new room or switch to training mode using toggle
-                  showRoomModal();
-                }, 2000);
+                // Opponent declined - show result modal
+                const matchResults = roomData.matchResults || { player1Wins: 0, draws: 0, player2Wins: 0 };
+                const scores = calculateMatchScore(matchResults.player1Wins, matchResults.draws, matchResults.player2Wins);
+                const myScore = isPlayer1 ? scores.player1Score : scores.player2Score;
+                const opponentScore = isPlayer1 ? scores.player2Score : scores.player1Score;
+                const iWon = myScore > opponentScore;
+                const player1Name = roomData.player1?.name || "";
+                const player2Name = roomData.player2?.name || "";
+                
+                // Hide match result modal
+                matchResultModal.classList.remove("show");
+                
+                // Show rematch decline result modal
+                showRematchDeclineResultModal(matchResults, scores, player1Name, player2Name, iWon);
               } else if (p1Rematch && p2Rematch) {
                 // Both players accepted - start new match
                 rematchStatus.style.display = "block";
@@ -5837,6 +6178,29 @@
     }
 
     async function leaveRoom() {
+      // Prevent leaving if match is not finished - must forfeit first
+      if (gameMode === "multiplayer" && currentRoomId && firebaseInitialized && db) {
+        try {
+          const roomRef = db.collection("gameRooms").doc(currentRoomId);
+          const roomDoc = await roomRef.get();
+          
+          if (roomDoc.exists) {
+            const roomData = roomDoc.data();
+            const totalGames = (roomData.matchResults?.player1Wins || 0) + (roomData.matchResults?.player2Wins || 0) + (roomData.matchResults?.draws || 0);
+            const matchFinished = roomData.gameOver && totalGames >= 2;
+            
+            // If match is not finished and there's an active game or opponent is present, prevent leaving
+            if (!matchFinished && roomData.player1 && roomData.player2 && (gameStarted || totalGames > 0)) {
+              // Show forfeit modal - don't allow leaving without forfeiting
+              showForfeitModal("leave-room");
+              return; // Don't leave yet - wait for user confirmation
+            }
+          }
+        } catch (error) {
+          console.error("Error checking room state before leaving:", error);
+        }
+      }
+
       if (roomListener) {
         roomListener();
         roomListener = null;
@@ -6075,6 +6439,11 @@
       // Update leaderboard (only once)
       await updateLeaderboard(player1Name, player2Name, scores, matchResults);
 
+      // If there was a forfeit, don't show match result modal (forfeit modal already shown)
+      if (roomData.forfeit === true) {
+        return;
+      }
+
       // Determine match outcome
       const myScore = isPlayer1 ? scores.player1Score : scores.player2Score;
       const opponentScore = isPlayer1 ? scores.player2Score : scores.player1Score;
@@ -6087,14 +6456,41 @@
         resultMessage = "YOU WIN";
         playSound("applause");
         createConfetti();
+        // Track multiplayer match win
+        trackEvent('multiplayer_match_complete', {
+          'result': 'win',
+          'my_score': myScore,
+          'opponent_score': opponentScore,
+          'player1_wins': matchResults.player1Wins,
+          'player2_wins': matchResults.player2Wins,
+          'draws': matchResults.draws
+        });
       } else if (myScore < opponentScore) {
         resultType = "you-lose";
         resultMessage = "YOU LOSE";
         // No losing sound when match result modal shows (user will click decline/accept)
+        // Track multiplayer match loss
+        trackEvent('multiplayer_match_complete', {
+          'result': 'loss',
+          'my_score': myScore,
+          'opponent_score': opponentScore,
+          'player1_wins': matchResults.player1Wins,
+          'player2_wins': matchResults.player2Wins,
+          'draws': matchResults.draws
+        });
       } else {
         resultType = "draw";
         resultMessage = "DRAW. POINTS ARE SPLIT";
         playSound("draw");
+        // Track multiplayer match draw
+        trackEvent('multiplayer_match_complete', {
+          'result': 'draw',
+          'my_score': myScore,
+          'opponent_score': opponentScore,
+          'player1_wins': matchResults.player1Wins,
+          'player2_wins': matchResults.player2Wins,
+          'draws': matchResults.draws
+        });
       }
       
       // Update status with result
@@ -6186,11 +6582,102 @@
       // Check if both players accepted (will be handled by room listener)
     }
     
+    function showRematchDeclineResultModal(matchResults, scores, player1Name, player2Name, iWon) {
+      // Determine result message
+      const resultType = iWon ? "you-win" : "you-lose";
+      const resultMessage = iWon ? "YOU WIN" : "YOU LOSE";
+      
+      // Update modal content
+      rematchDeclineResultTitle.textContent = resultMessage;
+      rematchDeclineResultTitle.className = resultType;
+      
+      // Build details
+      const myScore = isPlayer1 ? scores.player1Score : scores.player2Score;
+      const opponentScore = isPlayer1 ? scores.player2Score : scores.player1Score;
+      const opponentName = isPlayer1 ? player2Name : player1Name;
+      
+      if (iWon) {
+        rematchDeclineResultDetails.textContent = `Opponent declined rematch. You win the match!`;
+        playSound("applause");
+        createConfetti();
+      } else {
+        rematchDeclineResultDetails.textContent = `You declined rematch. ${opponentName} wins the match.`;
+      }
+      
+      // Update scores
+      rematchDeclinePlayer1Name.textContent = player1Name;
+      rematchDeclinePlayer1Score.textContent = `${scores.player1Score} pts`;
+      rematchDeclinePlayer2Name.textContent = player2Name;
+      rematchDeclinePlayer2Score.textContent = `${scores.player2Score} pts`;
+      
+      // Show modal
+      rematchDeclineResultModal.classList.add("show");
+    }
+    
+    function showForfeitResultModal(player1Name, player2Name, iAmForfeiter) {
+      // Determine result message
+      const resultType = iAmForfeiter ? "you-lose" : "you-win";
+      const resultMessage = iAmForfeiter ? "YOU LOSE" : "YOU WIN";
+      
+      // Update modal content
+      rematchDeclineResultTitle.textContent = resultMessage;
+      rematchDeclineResultTitle.className = resultType;
+      
+      // Build details and scores
+      if (iAmForfeiter) {
+        // Forfeiter sees: they lost, 0 points, opponent gets 4 points
+        rematchDeclineResultDetails.textContent = `You forfeited the match.`;
+        if (isPlayer1) {
+          rematchDeclinePlayer1Name.textContent = player1Name;
+          rematchDeclinePlayer1Score.textContent = `0 pts`;
+          rematchDeclinePlayer2Name.textContent = player2Name;
+          rematchDeclinePlayer2Score.textContent = `4 pts`;
+        } else {
+          rematchDeclinePlayer1Name.textContent = player1Name;
+          rematchDeclinePlayer1Score.textContent = `4 pts`;
+          rematchDeclinePlayer2Name.textContent = player2Name;
+          rematchDeclinePlayer2Score.textContent = `0 pts`;
+        }
+      } else {
+        // Winner sees: they won, 4 points, opponent got 0 points
+        rematchDeclineResultDetails.textContent = `Opponent forfeited. You win the match!`;
+        playSound("applause");
+        createConfetti();
+        if (isPlayer1) {
+          rematchDeclinePlayer1Name.textContent = player1Name;
+          rematchDeclinePlayer1Score.textContent = `4 pts`;
+          rematchDeclinePlayer2Name.textContent = player2Name;
+          rematchDeclinePlayer2Score.textContent = `0 pts`;
+        } else {
+          rematchDeclinePlayer1Name.textContent = player1Name;
+          rematchDeclinePlayer1Score.textContent = `0 pts`;
+          rematchDeclinePlayer2Name.textContent = player2Name;
+          rematchDeclinePlayer2Score.textContent = `4 pts`;
+        }
+      }
+      
+      // Show modal
+      rematchDeclineResultModal.classList.add("show");
+    }
+    
     async function handleRematchDecline() {
       if (!currentRoomId || !firebaseInitialized || !db) return;
       
       const roomRef = db.collection("gameRooms").doc(currentRoomId);
+      const roomDoc = await roomRef.get();
+      if (!roomDoc.exists) return;
+      
+      const roomData = roomDoc.data();
       const playerKey = isPlayer1 ? "player1" : "player2";
+      
+      // Get match results and scores
+      const matchResults = roomData.matchResults || { player1Wins: 0, draws: 0, player2Wins: 0 };
+      const scores = calculateMatchScore(matchResults.player1Wins, matchResults.draws, matchResults.player2Wins);
+      const myScore = isPlayer1 ? scores.player1Score : scores.player2Score;
+      const opponentScore = isPlayer1 ? scores.player2Score : scores.player1Score;
+      const iWon = myScore > opponentScore;
+      const player1Name = roomData.player1?.name || "";
+      const player2Name = roomData.player2?.name || "";
       
       // Mark this player as declining rematch
       await roomRef.update({
@@ -6198,12 +6685,11 @@
         [`${playerKey}.rematchDeclined`]: true
       });
       
-      // Hide modal and return to room creation
+      // Hide match result modal
       matchResultModal.classList.remove("show");
-      leaveRoom();
-      // Keep multiplayer mode so they can create/join a new room or switch to training mode using toggle
-      // Don't force training mode - let them choose
-      showRoomModal(); // Show room creation dialog
+      
+      // Show rematch decline result modal
+      showRematchDeclineResultModal(matchResults, scores, player1Name, player2Name, iWon);
     }
     
 
@@ -6300,7 +6786,35 @@
         console.error("Error updating leaderboard:", error);
       }
     }
-
+    
+    // Function to clear multiplayer leaderboard (for testing/admin use)
+    // Call from browser console: clearMultiplayerLeaderboard()
+    window.clearMultiplayerLeaderboard = async function() {
+      if (!firebaseInitialized || !db) {
+        console.error("Firebase not initialized");
+        return;
+      }
+      
+      try {
+        const snapshot = await db.collection("multiplayerLeaderboard").get();
+        const batch = db.batch();
+        let count = 0;
+        
+        snapshot.docs.forEach(doc => {
+          batch.delete(doc.ref);
+          count++;
+        });
+        
+        await batch.commit();
+        console.log(`✅ Cleared ${count} entries from multiplayer leaderboard`);
+        alert(`Cleared ${count} entries from multiplayer leaderboard`);
+      } catch (error) {
+        console.error("Error clearing leaderboard:", error);
+        alert("Error clearing leaderboard: " + error.message);
+      }
+    };
+    
+    // Make function available globally for console access
     // Initialize sound
     const savedSound = localStorage.getItem("tictac9x9_sound");
     if (savedSound !== null) {
@@ -6899,10 +7413,58 @@
     if (matchResultDeclineBtn) {
       matchResultDeclineBtn.addEventListener("click", handleRematchDecline);
     }
+    if (rematchDeclineBackBtn) {
+      rematchDeclineBackBtn.addEventListener("click", async () => {
+        // Hide modal
+        rematchDeclineResultModal.classList.remove("show");
+        
+        // Close room if it still exists (might already be deleted by forfeiter)
+        if (currentRoomId && firebaseInitialized && db) {
+          try {
+            const roomRef = db.collection("gameRooms").doc(currentRoomId);
+            const roomDoc = await roomRef.get();
+            if (roomDoc.exists) {
+              await roomRef.delete();
+            }
+          } catch (error) {
+            console.error("Error closing room:", error);
+          }
+        }
+        
+        // Clean up local state
+        if (roomListener) {
+          roomListener();
+          roomListener = null;
+        }
+        
+        currentRoomId = null;
+        isPlayer1 = false;
+        opponentName = "";
+        player1Name = "";
+        player2Name = "";
+        matchGameNumber = 0;
+        matchResults = { player1Wins: 0, draws: 0, player2Wins: 0 };
+        currentMatchScore = { player1: 0, player2: 0 };
+        gameOver = false;
+        gameStarted = false;
+        updateMultiplayerScoreDisplay();
+        
+        // Stop loading animation if any
+        if (loadingDotsInterval) {
+          clearInterval(loadingDotsInterval);
+          loadingDotsInterval = null;
+        }
+        
+        // Show multiplayer dialog
+        showRoomModal();
+      });
+    }
     
     forfeitContinueBtn.addEventListener("click", () => {
       hideForfeitModal();
       isNavigatingAway = false;
+      pendingForfeitOnUnload = false;
+      forfeitModalShownForUnload = false;
       const action = forfeitModal.dataset.action || "";
       delete forfeitModal.dataset.action;
       
@@ -6922,6 +7484,7 @@
     forfeitConfirmBtn.addEventListener("click", async () => {
       hideForfeitModal();
       isNavigatingAway = false;
+      pendingForfeitOnUnload = false;
       const action = forfeitModal.dataset.action || "";
       delete forfeitModal.dataset.action;
       
@@ -6930,6 +7493,22 @@
       // If it was a restart action, start a new game after forfeit
       if (action === "restart") {
         startNewRound();
+      } else if (action === "forfeit-button") {
+        // Forfeit button clicked - room will be closed by handleMultiplayerForfeit
+        // Stay in multiplayer mode, room will be closed
+      } else if (action === "leave-room" || action === "switch-mode") {
+        // After forfeiting in multiplayer, the room will be closed by handleMultiplayerForfeit
+        // Just switch to training mode
+        gameMode = "training";
+        saveGameMode();
+        updateModeToggle();
+        startNewRound(); // Reset to training state
+      } else if (action === "" && gameMode === "multiplayer") {
+        // Page close/refresh forfeit - room will be closed by handleMultiplayerForfeit
+        // Allow page to close/refresh naturally after forfeit is processed
+        setTimeout(() => {
+          // Page will close/refresh naturally
+        }, 1000);
       }
       // Otherwise, allow page to refresh/close naturally
     });
@@ -6946,21 +7525,105 @@
     // Handle page close/refresh - show forfeit modal if game is active
     let isNavigatingAway = false;
     
+    // Track if we should prevent navigation
+    let pendingForfeitOnUnload = false;
+    let forfeitModalShownForUnload = false;
+    
+    // Show forfeit modal when user tries to leave (before beforeunload)
+    window.addEventListener("mouseleave", (e) => {
+      if (e.clientY < 0 && gameMode === "multiplayer" && currentRoomId) {
+        const totalGames = (matchResults?.player1Wins || 0) + (matchResults?.player2Wins || 0) + (matchResults?.draws || 0);
+        const matchFinished = gameOver && totalGames >= 2;
+        if (!matchFinished && (gameStarted || totalGames > 0) && !forfeitModal.classList.contains("show")) {
+          showForfeitModal("");
+          forfeitModalShownForUnload = true;
+        }
+      }
+    });
+    
     window.addEventListener("beforeunload", (e) => {
-      // Only trigger forfeit if game has actually started (not just prepared)
+      // Check for multiplayer match in progress
+      if (gameMode === "multiplayer" && currentRoomId) {
+        // Check if match appears to be in progress based on local state
+        const totalGames = (matchResults?.player1Wins || 0) + (matchResults?.player2Wins || 0) + (matchResults?.draws || 0);
+        const matchFinished = gameOver && totalGames >= 2;
+        // If match is not finished and game has started, prevent leaving
+        if (!matchFinished && (gameStarted || totalGames > 0)) {
+          // If modal wasn't shown yet, try to show it (may not work reliably)
+          if (!forfeitModalShownForUnload && !forfeitModal.classList.contains("show")) {
+            showForfeitModal("");
+            forfeitModalShownForUnload = true;
+          }
+          pendingForfeitOnUnload = true;
+          // Prevent navigation
+          e.preventDefault();
+          e.returnValue = "You have an active multiplayer game. Leaving will forfeit the match and award 4 points to your opponent."; // Required for Chrome
+          return "You have an active multiplayer game. Leaving will forfeit the match and award 4 points to your opponent."; // Required for other browsers
+        }
+      }
+      
+      // Also check for training mode active game
       const savedGameState = loadGameState();
       const hasMovesOnBoard = board.some(row => row.some(cell => cell !== ""));
       if (savedGameState && savedGameState.playerName && 
           savedGameState.playerName.toLowerCase() === (currentPlayerName || "").toLowerCase() &&
-          !gameOver && gameStarted && hasMovesOnBoard) {
-        // Show the forfeit modal immediately
-        showForfeitModal();
-        isNavigatingAway = true;
-        
+          gameMode === "training" && !gameOver && gameStarted && hasMovesOnBoard) {
         // Trigger browser's confirmation dialog
         e.preventDefault();
         e.returnValue = ""; // Required for Chrome
         return ""; // Required for other browsers
+      }
+    });
+    
+    // Handle visibility change - if page becomes hidden and forfeit is pending, execute it
+    document.addEventListener("visibilitychange", async () => {
+      if (document.hidden && pendingForfeitOnUnload && gameMode === "multiplayer" && currentRoomId && firebaseInitialized && db) {
+        // User is leaving - execute forfeit
+        try {
+          await handleMultiplayerForfeit();
+        } catch (error) {
+          console.error("Error executing forfeit on visibilitychange:", error);
+        }
+      }
+    });
+    
+    // Handle actual page unload - execute forfeit if user confirmed leaving
+    window.addEventListener("pagehide", async () => {
+      if (pendingForfeitOnUnload && gameMode === "multiplayer" && currentRoomId && firebaseInitialized && db) {
+        // User confirmed leaving - execute forfeit
+        try {
+          await handleMultiplayerForfeit();
+        } catch (error) {
+          console.error("Error executing forfeit on pagehide:", error);
+          // Fallback: try to update Firestore directly
+          try {
+            const roomRef = db.collection("gameRooms").doc(currentRoomId);
+            const roomDoc = await roomRef.get();
+            if (roomDoc.exists) {
+              const roomData = roomDoc.data();
+              let updatedMatchResults = { ...(roomData.matchResults || { player1Wins: 0, draws: 0, player2Wins: 0 }) };
+              if (isPlayer1) {
+                updatedMatchResults.player2Wins = 2;
+              } else {
+                updatedMatchResults.player1Wins = 2;
+              }
+              await roomRef.update({
+                gameOver: true,
+                winner: isPlayer1 ? "O" : "X",
+                matchResults: updatedMatchResults,
+                forfeit: true,
+                forfeitedBy: isPlayer1 ? "player1" : "player2",
+                lastMove: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              // Close room after a delay
+              setTimeout(async () => {
+                await roomRef.delete();
+              }, 2000);
+            }
+          } catch (fallbackError) {
+            console.error("Fallback forfeit also failed:", fallbackError);
+          }
+        }
       }
     });
 
