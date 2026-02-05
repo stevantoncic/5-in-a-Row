@@ -1628,16 +1628,16 @@
     }
 
     #nameSelectionStartBtn {
-      background: rgba(34, 197, 94, 0.1) !important;
-      border-color: rgba(34, 197, 94, 0.3) !important;
-      color: rgb(34, 197, 94) !important;
-      font-weight: 600 !important;
+      background: rgb(34, 197, 94) !important;
+      border-color: rgb(34, 197, 94) !important;
+      color: white !important;
+      font-weight: 700 !important;
     }
 
     #nameSelectionStartBtn:hover {
-      background: rgba(34, 197, 94, 0.2) !important;
-      border-color: rgba(34, 197, 94, 0.5) !important;
-      color: rgb(22, 163, 74) !important;
+      background: rgb(22, 163, 74) !important;
+      border-color: rgb(22, 163, 74) !important;
+      color: white !important;
       transform: translateY(-1px);
     }
 
@@ -2812,7 +2812,7 @@
           />
         </div>
         <div id="nameSelectionButtons" style="display: flex; gap: 8px; flex-direction: column;">
-          <button id="nameSelectionStartBtn" class="button" style="width: 100%; display: none;">Play Now</button>
+          <button id="nameSelectionStartBtn" class="button" style="width: 100%; display: none;">Play Unregistered</button>
           <button id="nameSelectionRegisterBtn" class="button" style="width: 100%; display: none;">Register Name</button>
           <button id="nameSelectionLoginBtn" class="button" style="width: 100%; display: none;">Login</button>
         </div>
@@ -3270,6 +3270,7 @@
       nameSelectionStartBtn.style.display = "none";
       nameSelectionRegisterBtn.style.display = "none";
       nameSelectionLoginBtn.style.display = "none";
+      nameSelectionStartBtn.textContent = "Play Unregistered";
       setTimeout(() => {
         nameSelectionInput.focus();
       }, 100);
@@ -3309,15 +3310,22 @@
       
       nameSelectionMessage.style.color = "var(--text-secondary)";
       
+      // Show "Play Unregistered" button immediately for valid names (optimistic UI)
+      // This will be updated after Firebase check completes
+      nameSelectionStartBtn.style.display = "block";
+      nameSelectionStartBtn.textContent = "Play Unregistered";
+      nameSelectionPasswordSection.style.display = "none";
+      nameSelectionLoginBtn.style.display = "none";
+      
       // Check if name is registered
       if (firebaseInitialized && db) {
         const isRegistered = await checkNameRegistered(name);
         if (isRegistered) {
-          // Name is registered - show password field and login button (NO warning)
-          nameSelectionPasswordSection.style.display = "block";
-          nameSelectionWarning.style.display = "none";
+          // Name is registered - hide play button, show password field and login button
           nameSelectionStartBtn.style.display = "none";
           nameSelectionRegisterBtn.style.display = "none";
+          nameSelectionPasswordSection.style.display = "block";
+          nameSelectionWarning.style.display = "none";
           nameSelectionLoginBtn.style.display = "block";
           nameSelectionMessage.textContent = `"${name}" is already registered. Enter password to login, or choose a different name.`;
           setTimeout(() => {
@@ -3330,7 +3338,7 @@
           nameSelectionStartBtn.style.display = "block";
           nameSelectionRegisterBtn.style.display = "block";
           nameSelectionLoginBtn.style.display = "none";
-          nameSelectionStartBtn.textContent = "Play without registering";
+          nameSelectionStartBtn.textContent = "Play Unregistered";
           nameSelectionMessage.textContent = `"${name}" is available. Choose to play now or register it.`;
         }
       } else {
@@ -3340,7 +3348,7 @@
         nameSelectionStartBtn.style.display = "block";
         nameSelectionRegisterBtn.style.display = "none";
         nameSelectionLoginBtn.style.display = "none";
-        nameSelectionStartBtn.textContent = "Play without registering";
+        nameSelectionStartBtn.textContent = "Play Unregistered";
         nameSelectionMessage.textContent = "Enter your name to start playing (minimum 3 characters)";
       }
     }
@@ -7192,15 +7200,32 @@
 
     // Name Selection Modal handlers - real-time checking with debounce
     nameSelectionInput.addEventListener("input", () => {
+      const name = nameSelectionInput.value.trim();
+      
+      // Show button immediately if name is valid (3+ chars)
+      if (name.length >= 3) {
+        nameSelectionStartBtn.style.display = "block";
+        nameSelectionStartBtn.textContent = "Play Unregistered";
+        nameSelectionPasswordSection.style.display = "none";
+        nameSelectionLoginBtn.style.display = "none";
+        nameSelectionWarning.style.display = "none";
+        nameSelectionRegisterBtn.style.display = "none";
+      } else {
+        // Hide buttons if name is too short
+        nameSelectionStartBtn.style.display = "none";
+        nameSelectionRegisterBtn.style.display = "none";
+        nameSelectionLoginBtn.style.display = "none";
+      }
+      
       // Clear previous timeout
       if (nameCheckTimeout) {
         clearTimeout(nameCheckTimeout);
       }
       
-      // Debounce the check - wait 500ms after user stops typing
+      // Debounce the Firebase check - wait 300ms after user stops typing
       nameCheckTimeout = setTimeout(() => {
         checkNameAndUpdateModal();
-      }, 500);
+      }, 300);
     });
 
     nameSelectionStartBtn.addEventListener("click", async () => {
@@ -7216,7 +7241,9 @@
       
       hideNameSelectionModal();
       await completeNameSetup(name);
-      startNewRound();
+      // Don't call startNewRound() here - completeNameSetup already calls it when
+      // humanPlayer/currentPlayer are undefined, and calling it again would flip
+      // nextHumanPlayer and make the computer start first.
     });
 
     nameSelectionRegisterBtn.addEventListener("click", async () => {
@@ -7321,7 +7348,8 @@
       // Alternate which mark the human controls each game
       humanPlayer = nextHumanPlayer;
       computerPlayer = humanPlayer === "X" ? "O" : "X";
-      currentPlayer = "X"; // X always starts
+      // Set starting player: if human is X, human goes first; if human is O, computer (X) goes first
+      currentPlayer = humanPlayer === "X" ? humanPlayer : computerPlayer;
 
       const cells = document.querySelectorAll(".cell");
       cells.forEach(cell => {
@@ -7358,6 +7386,9 @@
     async function init() {
       // Reset current streak on page refresh
       currentStreak = 0;
+      
+      // Reset nextHumanPlayer to "X" so first game after page reload always starts with human going first
+      nextHumanPlayer = "X";
       
       // Set initial state before any rendering
       gameMode = "training"; // Default to training mode
@@ -7476,7 +7507,10 @@
         showNameSelectionModal();
       } else {
         // Name exists - prepare the game so player can click to start
-        startNewRound();
+        // Only call startNewRound() if it wasn't already called by completeNameSetup()
+        if (humanPlayer === undefined || currentPlayer === undefined) {
+          startNewRound();
+        }
         if (gameMode === "training") startWaitingRoomCheck();
       }
     }
