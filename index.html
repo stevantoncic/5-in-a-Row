@@ -3509,12 +3509,45 @@
     }
 
     function onCellClick(e) {
+      console.log("Cell clicked!", {
+        computerThinking,
+        gameStarted,
+        gameOver,
+        humanPlayer,
+        currentPlayer,
+        hasHumanName: hasHumanName(),
+        gameMode
+      });
+      
       // Don't allow clicks if computer is thinking
-      if (computerThinking) return;
+      if (computerThinking) {
+        console.log("Blocked: computer thinking");
+        return;
+      }
+      
+      // Ensure game state is initialized
+      if (humanPlayer === undefined || currentPlayer === undefined) {
+        console.log("Game state not initialized, initializing...");
+        if (gameMode === "training" && hasHumanName()) {
+          startNewRound();
+          // After initializing, re-check conditions
+          if (humanPlayer === undefined || currentPlayer === undefined) {
+            console.log("Still not initialized after startNewRound");
+            return; // Still not initialized, can't proceed
+          }
+        } else {
+          console.log("Blocked: cannot initialize - gameMode:", gameMode, "hasHumanName:", hasHumanName());
+          return;
+        }
+      }
       
       // Allow clicks when game hasn't started (to start the game)
-      // Only block clicks if game has started AND (game is over OR computer is thinking)
-      if (gameStarted && gameOver) return;
+      // Only block clicks if game has started AND game is over
+      // If game hasn't started yet, allow clicks to start the game (even if gameOver was true from init)
+      if (gameStarted && gameOver) {
+        console.log("Blocked: game started and over");
+        return;
+      }
       
       // Clear preview classes when clicking
       const cell = e.currentTarget;
@@ -3524,24 +3557,41 @@
       // Allow clicks if:
       // 1. Game has started and it's human's turn, OR
       // 2. Game hasn't started yet but human goes first (currentPlayer === humanPlayer)
-      if (!gameStarted && currentPlayer !== humanPlayer) return;
-      if (gameStarted && currentPlayer !== humanPlayer) return;
-      if (!hasHumanName()) return;
+      if (!gameStarted && currentPlayer !== humanPlayer) {
+        console.log("Blocked: game not started and not human's turn", { currentPlayer, humanPlayer });
+        return;
+      }
+      if (gameStarted && currentPlayer !== humanPlayer) {
+        console.log("Blocked: game started but not human's turn", { currentPlayer, humanPlayer });
+        return;
+      }
+      if (!hasHumanName()) {
+        console.log("Blocked: no human name");
+        return;
+      }
+      
+      console.log("Click allowed, proceeding to handleMove");
 
       const r = parseInt(cell.dataset.row, 10);
       const c = parseInt(cell.dataset.col, 10);
+      
+      console.log("Cell coordinates:", r, c, "Board value:", board[r] ? board[r][c] : "row undefined");
 
-      if (board[r][c] !== "") {
+      if (!board || !board[r] || board[r][c] !== "") {
+        console.log("Blocked: cell already occupied or board invalid");
         return;
       }
 
       // If game hasn't started yet and human goes first, start it now
       if (!gameStarted && currentPlayer === humanPlayer) {
+        console.log("Starting game...");
         gameStarted = true;
+        gameOver = false; // Ensure game is not over when starting
         updateRestartButtonText();
         setStatusForTurn();
       }
 
+      console.log("Calling handleMove with:", r, c);
       handleMove(r, c, false);
     }
 
@@ -3584,7 +3634,11 @@
     }
 
     async function handleMove(r, c, isComputer) {
-      if (gameOver || !gameStarted) return;
+      console.log("handleMove called:", { r, c, isComputer, gameOver, gameStarted });
+      if (gameOver || !gameStarted) {
+        console.log("handleMove blocked:", { gameOver, gameStarted });
+        return;
+      }
       
       // In multiplayer mode, only allow moves for current player
       if (gameMode === "multiplayer" && !isComputer) {
@@ -7398,6 +7452,12 @@
       // Initialize board first
       initBoardUI();
       
+      // Debug: Test if board clicks are working
+      console.log("Board initialized, cells:", document.querySelectorAll(".cell").length);
+      boardElem.addEventListener("click", (e) => {
+        console.log("Board element clicked!", e.target);
+      }, true); // Use capture phase to catch all clicks
+      
       // Initialize toggle switches
       if (modeToggleSwitch) {
         initializeToggle(modeToggleSwitch);
@@ -7510,6 +7570,10 @@
         // Only call startNewRound() if it wasn't already called by completeNameSetup()
         if (humanPlayer === undefined || currentPlayer === undefined) {
           startNewRound();
+        } else {
+          // Ensure gameOver is false even if startNewRound() was already called
+          // (because init() sets gameOver = true after completeNameSetup might have called startNewRound)
+          gameOver = false;
         }
         if (gameMode === "training") startWaitingRoomCheck();
       }
