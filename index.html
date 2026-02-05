@@ -3672,6 +3672,13 @@
             lastGameResultText = `I just lost in 5-in-a-Row. My streak was ${currentStreak}. Can you do better?`;
             currentStreak = 0;
             playSound("aw");
+            // Update statistics for loss
+            currentPlayerStats.gamesPlayed++;
+            currentPlayerStats.losses++;
+            currentPlayerStats.currentStreak = 0;
+            globalStats.gamesPlayed++;
+            globalStats.losses++;
+            saveStats();
             // Track training mode loss
             trackEvent('game_complete', {
               'game_mode': 'training',
@@ -3691,6 +3698,13 @@
             createConfetti();
             lastGameResultText = `I just won in 5-in-a-Row! Streak: ${currentStreak}. Try to beat me!`;
             checkWinAchievements();
+            // Update statistics for win
+            currentPlayerStats.gamesPlayed++;
+            currentPlayerStats.wins++;
+            currentPlayerStats.currentStreak = currentStreak;
+            globalStats.gamesPlayed++;
+            globalStats.wins++;
+            saveStats();
             // Track training mode win
             trackEvent('game_complete', {
               'game_mode': 'training',
@@ -3728,6 +3742,12 @@
           computerThinking = false;
           resetGameState();
           clearGameState(); // Clear saved game state when game ends
+          // Update statistics for draw
+          currentPlayerStats.gamesPlayed++;
+          currentPlayerStats.draws++;
+          globalStats.gamesPlayed++;
+          globalStats.draws++;
+          saveStats();
           // Track training mode draw
           trackEvent('game_complete', {
             'game_mode': 'training',
@@ -4101,6 +4121,16 @@
       setStatusWithMark(getComputerDisplayName(), computerPlayer, " wins! (Forfeit)");
       statusRow.className = "status-neutral";
       playSound("aw");
+
+      // Update statistics for forfeit (counts as loss in training mode)
+      if (gameMode === "training") {
+        currentPlayerStats.gamesPlayed++;
+        currentPlayerStats.losses++;
+        currentPlayerStats.currentStreak = 0;
+        globalStats.gamesPlayed++;
+        globalStats.losses++;
+        saveStats();
+      }
 
       // Update displays
       if (gameMode === "training") {
@@ -4677,6 +4707,51 @@
         if (typeof data.streak === "number" && typeof data.name === "string") {
           bestStreak = data.streak;
           bestStreakName = data.name;
+        }
+      } catch (e) {
+        // ignore parse errors
+      }
+    }
+
+    // ---- Stats helpers ----
+
+    function saveStats() {
+      try {
+        localStorage.setItem("tictac9x9_currentPlayerStats", JSON.stringify(currentPlayerStats));
+        localStorage.setItem("tictac9x9_globalStats", JSON.stringify(globalStats));
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+
+    function loadStats() {
+      try {
+        const currentStatsRaw = localStorage.getItem("tictac9x9_currentPlayerStats");
+        if (currentStatsRaw) {
+          const data = JSON.parse(currentStatsRaw);
+          if (data && typeof data.gamesPlayed === "number") {
+            currentPlayerStats = {
+              gamesPlayed: data.gamesPlayed || 0,
+              wins: data.wins || 0,
+              losses: data.losses || 0,
+              draws: data.draws || 0,
+              currentStreak: data.currentStreak || 0
+            };
+          }
+        }
+        
+        const globalStatsRaw = localStorage.getItem("tictac9x9_globalStats");
+        if (globalStatsRaw) {
+          const data = JSON.parse(globalStatsRaw);
+          if (data && typeof data.gamesPlayed === "number") {
+            globalStats = {
+              gamesPlayed: data.gamesPlayed || 0,
+              wins: data.wins || 0,
+              losses: data.losses || 0,
+              draws: data.draws || 0,
+              bestStreak: data.bestStreak || 0
+            };
+          }
         }
       } catch (e) {
         // ignore parse errors
@@ -7336,6 +7411,7 @@
       }
       
       await loadBestStreak();
+      loadStats();
       loadAchievements();
       updateAchievementsDisplay();
       
